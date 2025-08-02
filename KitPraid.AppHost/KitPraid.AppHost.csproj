@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1"/>
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>2d2363f6-7e86-4aa3-a8bc-c95c9870bff3</UserSecretsId>
+        <RootNamespace>KitPraid</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\IdentityServer.Api\IdentityServer.Api.csproj" />
+      <ProjectReference Include="..\KitPraid.Components\KitPraid.Components.csproj" />
+    </ItemGroup>
+
+</Project>
