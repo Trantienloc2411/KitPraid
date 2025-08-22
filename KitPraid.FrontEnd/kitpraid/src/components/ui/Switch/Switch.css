@@ -1,0 +1,159 @@
+/* Switch Container */
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Switch Base */
+.switch {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.switch:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Switch Track */
+.switch-track {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.switch-checked .switch-track {
+  background: #fbbf24;
+  border-color: #fbbf24;
+}
+
+.switch-disabled .switch-track {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+/* Switch Thumb */
+.switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.switch-checked .switch-thumb {
+  transform: translateX(20px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Switch Sizes */
+.switch-sm .switch-track {
+  width: 36px;
+  height: 20px;
+}
+
+.switch-sm .switch-thumb {
+  width: 12px;
+  height: 12px;
+}
+
+.switch-sm.switch-checked .switch-thumb {
+  transform: translateX(16px);
+}
+
+.switch-lg .switch-track {
+  width: 52px;
+  height: 28px;
+}
+
+.switch-lg .switch-thumb {
+  width: 20px;
+  height: 20px;
+}
+
+.switch-lg.switch-checked .switch-thumb {
+  transform: translateX(24px);
+}
+
+/* Switch Label */
+.switch-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch-label-left {
+  order: -1;
+}
+
+.switch-label-disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Hover Effects */
+.switch:not(:disabled):hover .switch-track {
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+}
+
+.switch:not(:disabled):hover .switch-thumb {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .switch-container {
+    gap: 0.5rem;
+  }
+  
+  .switch-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .switch-track {
+    background: #374151;
+  }
+  
+  .switch-checked .switch-track {
+    background: #fbbf24;
+    border-color: #fbbf24;
+  }
+  
+  .switch-disabled .switch-track {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+  
+  .switch-label {
+    color: #f9fafb;
+  }
+  
+  .switch-label-disabled {
+    color: #6b7280;
+  }
+}
