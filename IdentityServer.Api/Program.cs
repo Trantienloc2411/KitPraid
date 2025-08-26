@@ -58,10 +58,22 @@ public class Program
                     RoleClaimType = "role"
                 };
             });
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontEnd", policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                ;
+
+            });
+        });
         
         var app = builder.Build();
         
         app.UseRouting();
+        app.UseCors("AllowFrontEnd");
         app.UseIdentityServer();
         app.UseAuthorization();
         app.MapControllers();
@@ -72,7 +84,9 @@ public class Program
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.UseCors("AllowFrontEnd");
         }
+
         app.UseHttpsRedirection();
         app.Run();
     }
