@@ -5,64 +5,82 @@ import {
   Input,
   VStack,
   Text,
-  Heading,
-  Container,
   HStack,
 } from '@chakra-ui/react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaGoogle, FaFacebook } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
 import { Link as RouterLink } from 'react-router-dom';
-
-import BreadcrumbComponent from '../../components/ui/Breadcrumb';
 import { toaster } from '../../components/ui/toaster';
+import { useAppDispatch, useAppSelector } from '../../hooks/hook';
+import { login } from '../../redux/authSlice';
+interface SignInProps {
+  textColor: string;
+  subtextColor: string;
+}
 
-const SignIn = () => {
+const SignIn: React.FC<SignInProps> = ({ textColor, subtextColor }) => {
+  const { loading } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [signInData, setSignInData] = useState({
+    email: '',
+    password: '',
+  });
+  const [signInErrors, setSignInErrors] = useState<{ email?: string; password?: string }>({});
+  const [isSignInLoading, setIsSignInLoading] = useState(false);
 
-  const validateForm = () => {
+  // Sign In validation
+  const validateSignIn = () => {
     const newErrors: { email?: string; password?: string } = {};
 
-    if (!email) {
+    if (!signInData.email) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
+    } else if (!/\S+@\S+\.\S+/.test(signInData.email)) {
       newErrors.email = 'Email is invalid';
     }
 
-    if (!password) {
+    if (!signInData.password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
+    } else if (signInData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    setErrors(newErrors);
+    setSignInErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Sign In handlers
+  const handleSignInInputChange = (field: string, value: string) => {
+    setSignInData(prev => ({ ...prev, [field]: value }));
+    if (signInErrors[field as keyof typeof signInErrors]) {
+      setSignInErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
+    console.log('Form submitted with data:', signInData);
+
+    if (!validateSignIn()) {
+      console.log('Validation failed');
       return;
     }
 
-    setIsLoading(true);
-    
+    console.log('Starting login process...');
+    setIsSignInLoading(true);
+
     try {
-      // TODO: Implement actual sign in logic
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
+      // Dispatch login action and wait for result
+      console.log('Dispatching login action...');
+      const result = await dispatch(login(signInData)).unwrap();
+      console.log('Login successful:', result);
       toaster.success({
         title: 'Success',
         description: 'Signed in successfully!',
         duration: 3000,
         closable: true,
       });
-      
-      // TODO: Redirect to dashboard or home page
     } catch (error) {
+      console.error('Login error:', error);
       toaster.error({
         title: 'Error',
         description: 'Failed to sign in. Please try again.',
@@ -70,191 +88,136 @@ const SignIn = () => {
         closable: true,
       });
     } finally {
-      setIsLoading(false);
+      setIsSignInLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google OAuth
-    toaster.info({
-      title: 'Coming Soon',
-      description: 'Google sign in will be available soon!',
-      duration: 3000,
-      closable: true,
-    });
-  };
-
-  const handleFacebookSignIn = () => {
-    // TODO: Implement Facebook OAuth
-    toaster.info({
-      title: 'Coming Soon',
-      description: 'Facebook sign in will be available soon!',
-      duration: 3000,
-      closable: true,
-    });
-  };
-
   return (
-    <Container maxW="100%" py={20}>
-      <BreadcrumbComponent
-        items={[
-          { label: 'Authentication', href: '/auth' },
-          { label: 'Sign In', isCurrentPage: true }
-        ]}
-      />
-      
-      <Box
-        bg="white"
-        p={8}
-        borderRadius="lg"
-        boxShadow="xl"
-        border="1px"
-        borderColor="gray.200"
-      >
-        <VStack gap={6} align="stretch">
-          <Box textAlign="center">
-            <Heading size="lg" color="gray.800" mb={2}>
-              Welcome Back
-            </Heading>
-            <Text color="gray.600">
-              Sign in to your KitPraid account
+    <Box px={0} pt={6}>
+      <form onSubmit={handleSignInSubmit}>
+        <VStack gap={5}>
+          <Box w="full">
+            <Text as="label" display="block" mb={2} fontWeight="semibold" color={textColor}>
+              Email Address
             </Text>
+            <Box position="relative">
+              <Box
+                position="absolute"
+                left={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
+              >
+                <FaEnvelope color="gray.400" />
+              </Box>
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={signInData.email}
+                onChange={(e) => handleSignInInputChange('email', e.target.value)}
+                size="lg"
+                pl={12}
+                h="56px"
+                borderRadius="xl"
+                border="2px"
+                borderColor="gray.200"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)"
+                }}
+                _hover={{ borderColor: "gray.300" }}
+                className="input-field"
+              />
+            </Box>
+            {signInErrors.email && (
+              <Text color="red.500" fontSize="sm" mt={2}>
+                {signInErrors.email}
+              </Text>
+            )}
           </Box>
 
-          <form onSubmit={handleSubmit}>
-            <VStack gap={4}>
-              <Box>
-                <Text as="label" display="block" mb={2} fontWeight="medium" color="gray.700">
-                  Email
-                </Text>
-                <Box position="relative">
-                  <Box
-                    position="absolute"
-                    left={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                  >
-                    <FaEnvelope color="gray.400" />
-                  </Box>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    size="lg"
-                    pl={10}
-                  />
-                </Box>
-                {errors.email && (
-                  <Text color="red.500" fontSize="sm" mt={1}>
-                    {errors.email}
-                  </Text>
-                )}
-              </Box>
-
-              <Box>
-                <Text as="label" display="block" mb={2} fontWeight="medium" color="gray.700">
-                  Password
-                </Text>
-                <Box position="relative">
-                  <Box
-                    position="absolute"
-                    left={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                  >
-                    <FaLock color="gray.400" />
-                  </Box>
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    size="lg"
-                    pl={10}
-                    pr={12}
-                  />
-                  <Box
-                    position="absolute"
-                    right={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                    cursor="pointer"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <FaEyeSlash color="gray.400" /> : <FaEye color="gray.400" />}
-                  </Box>
-                </Box>
-                {errors.password && (
-                  <Text color="red.500" fontSize="sm" mt={1}>
-                    {errors.password}
-                  </Text>
-                )}
-              </Box>
-
-              <Button
-                type="submit"
-                colorScheme="blue"
-                size="lg"
-                width="full"
-                loading={isLoading}
-                loadingText="Signing In..."
+          <Box w="full">
+            <Text as="label" display="block" mb={2} fontWeight="semibold" color={textColor}>
+              Password
+            </Text>
+            <Box position="relative">
+              <Box
+                position="absolute"
+                left={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
               >
-                Sign In
-              </Button>
-            </VStack>
-          </form>
+                <FaLock color="gray.400" />
+              </Box>
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                value={signInData.password}
+                onChange={(e) => handleSignInInputChange('password', e.target.value)}
+                size="lg"
+                pl={12}
+                pr={12}
+                h="56px"
+                borderRadius="xl"
+                border="2px"
+                borderColor="gray.200"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)"
+                }}
+                _hover={{ borderColor: "gray.300" }}
+                className="input-field"
+              />
+              <Box
+                position="absolute"
+                right={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
+                cursor="pointer"
+                onClick={() => setShowPassword(!showPassword)}
+                p={2}
+                borderRadius="md"
+                _hover={{ bg: "gray.100" }}
+              >
+                {showPassword ? <FaEyeSlash color="gray.400" /> : <FaEye color="gray.400" />}
+              </Box>
+            </Box>
+            {signInErrors.password && (
+              <Text color="red.500" fontSize="sm" mt={2}>
+                {signInErrors.password}
+              </Text>
+            )}
+          </Box>
 
-          <HStack justify="space-between" fontSize="sm">
+          <HStack justify="space-between" w="full" fontSize="sm">
             <RouterLink to="/auth/login/forgot-password">
               <Text color="blue.500" _hover={{ textDecoration: 'underline' }} cursor="pointer">
                 Forgot Password?
               </Text>
             </RouterLink>
-            <Text color="gray.600">
-              Don't have an account?{' '}
-              <RouterLink to="/auth/signup">
-                <Text color="blue.500" _hover={{ textDecoration: 'underline' }} cursor="pointer" display="inline">
-                  Sign Up
-                </Text>
-              </RouterLink>
-            </Text>
           </HStack>
 
-          <Box borderTop="1px" borderColor="gray.200" pt={6} />
-
-          <VStack gap={3}>
-            <Text fontSize="sm" color="gray.600">
-              Or continue with
-            </Text>
-            
-            <HStack gap={4} width="full">
-              <Button
-                variant="outline"
-                size="lg"
-                width="full"
-                onClick={handleGoogleSignIn}
-              >
-                <FaGoogle style={{ marginRight: '8px' }} />
-                Google
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                width="full"
-                onClick={handleFacebookSignIn}
-              >
-                <FaFacebook style={{ marginRight: '8px' }} />
-                Facebook
-              </Button>
-            </HStack>
-          </VStack>
+          <Button
+            type="submit"
+            colorPalette="blue"
+            size="lg"
+            width="full"
+            height="56px"
+            borderRadius="xl"
+            fontSize="lg"
+            fontWeight="semibold"
+            loading={isSignInLoading}
+            loadingText="Signing In..."
+            _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
+            transition="all 0.2s"
+          >
+            Sign In
+          </Button>
         </VStack>
-      </Box>
-    </Container>
+      </form>
+    </Box>
   );
 };
 

@@ -5,20 +5,22 @@ import {
   Input,
   VStack,
   Text,
-  Heading,
-  Container,
   HStack,
 } from '@chakra-ui/react';
-import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser, FaGoogle, FaFacebook } from 'react-icons/fa';
-import { Link as RouterLink } from 'react-router-dom';
-
-import BreadcrumbComponent from '../../components/ui/Breadcrumb';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaUser } from 'react-icons/fa';
 import { toaster } from '../../components/ui/toaster';
 
-const SignUp = () => {
+interface SignUpProps {
+  textColor: string;
+  subtextColor: string;
+}
+
+const SignUp: React.FC<SignUpProps> = ({ textColor, subtextColor }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState({
+  
+  // Sign Up state
+  const [signUpData, setSignUpData] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -26,8 +28,8 @@ const SignUp = () => {
     confirmPassword: '',
     acceptTerms: false,
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [signUpErrors, setSignUpErrors] = useState<{ [key: string]: string }>({});
+  const [isSignUpLoading, setIsSignUpLoading] = useState(false);
 
   const getPasswordStrength = (password: string) => {
     let score = 0;
@@ -43,66 +45,65 @@ const SignUp = () => {
     return { score, color: 'green', text: 'Strong' };
   };
 
-  const passwordStrength = getPasswordStrength(formData.password);
+  const passwordStrength = getPasswordStrength(signUpData.password);
 
-  const validateForm = () => {
+  // Sign Up validation
+  const validateSignUp = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.firstName.trim()) {
+    if (!signUpData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     }
 
-    if (!formData.lastName.trim()) {
+    if (!signUpData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
     }
 
-    if (!formData.email) {
+    if (!signUpData.email) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(signUpData.email)) {
       newErrors.email = 'Email is invalid';
     }
 
-    if (!formData.password) {
+    if (!signUpData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
+    } else if (signUpData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     }
 
-    if (!formData.confirmPassword) {
+    if (!signUpData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
+    } else if (signUpData.password !== signUpData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
-    if (!formData.acceptTerms) {
+    if (!signUpData.acceptTerms) {
       newErrors.acceptTerms = 'You must accept the terms and conditions';
     }
 
-    setErrors(newErrors);
+    setSignUpErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+  // Sign Up handlers
+  const handleSignUpInputChange = (field: string, value: string | boolean) => {
+    setSignUpData(prev => ({ ...prev, [field]: value }));
+    if (signUpErrors[field]) {
+      setSignUpErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    if (!validateSignUp()) {
       return;
     }
 
-    setIsLoading(true);
+    setIsSignUpLoading(true);
     
     try {
-      // TODO: Implement actual sign up logic
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toaster.success({
         title: 'Success',
@@ -111,7 +112,6 @@ const SignUp = () => {
         closable: true,
       });
       
-      // TODO: Redirect to email verification page
     } catch (error) {
       toaster.error({
         title: 'Error',
@@ -120,334 +120,306 @@ const SignUp = () => {
         closable: true,
       });
     } finally {
-      setIsLoading(false);
+      setIsSignUpLoading(false);
     }
   };
 
-  const handleGoogleSignUp = () => {
-    // TODO: Implement Google OAuth
-    toaster.info({
-      title: 'Coming Soon',
-      description: 'Google sign up will be available soon!',
-      duration: 3000,
-      closable: true,
-    });
-  };
-
-  const handleFacebookSignUp = () => {
-    // TODO: Implement Facebook OAuth
-    toaster.info({
-      title: 'Coming Soon',
-      description: 'Facebook sign up will be available soon!',
-      duration: 3000,
-      closable: true,
-    });
-  };
-
   return (
-    <Container maxW="md" py={10}>
-      <BreadcrumbComponent
-        items={[
-          { label: 'Authentication', href: '/auth' },
-          { label: 'Sign Up', isCurrentPage: true }
-        ]}
-      />
-      
-      <Box
-        bg="white"
-        p={8}
-        borderRadius="lg"
-        boxShadow="xl"
-        border="1px"
-        borderColor="gray.200"
-      >
-        <VStack gap={6} align="stretch">
-          <Box textAlign="center">
-            <Heading size="lg" color="gray.800" mb={2}>
-              Create Account
-            </Heading>
-            <Text color="gray.600">
-              Join KitPraid and start shopping today
-            </Text>
-          </Box>
-
-          <form onSubmit={handleSubmit}>
-            <VStack gap={4}>
-              <HStack gap={4} width="full">
-                <Box flex={1}>
-                  <Text as="label" display="block" mb={2} fontWeight="medium" color="gray.700">
-                    First Name
-                  </Text>
-                  <Box position="relative">
-                    <Box
-                      position="absolute"
-                      left={3}
-                      top="50%"
-                      transform="translateY(-50%)"
-                      zIndex={1}
-                    >
-                      <FaUser color="gray.400" />
-                    </Box>
-                    <Input
-                      type="text"
-                      placeholder="First name"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      size="lg"
-                      pl={10}
-                    />
-                  </Box>
-                  {errors.firstName && (
-                    <Text color="red.500" fontSize="sm" mt={1}>
-                      {errors.firstName}
-                    </Text>
-                  )}
-                </Box>
-
-                <Box flex={1}>
-                  <Text as="label" display="block" mb={2} fontWeight="medium" color="gray.700">
-                    Last Name
-                  </Text>
-                  <Input
-                    type="text"
-                    placeholder="Last name"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    size="lg"
-                  />
-                  {errors.lastName && (
-                    <Text color="red.500" fontSize="sm" mt={1}>
-                      {errors.lastName}
-                    </Text>
-                  )}
-                </Box>
-              </HStack>
-
-              <Box>
-                <Text as="label" display="block" mb={2} fontWeight="medium" color="gray.700">
-                  Email
-                </Text>
-                <Box position="relative">
-                  <Box
-                    position="absolute"
-                    left={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                  >
-                    <FaEnvelope color="gray.400" />
-                  </Box>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    size="lg"
-                    pl={10}
-                  />
-                </Box>
-                {errors.email && (
-                  <Text color="red.500" fontSize="sm" mt={1}>
-                    {errors.email}
-                  </Text>
-                )}
-              </Box>
-
-              <Box>
-                <Text as="label" display="block" mb={2} fontWeight="medium" color="gray.700">
-                  Password
-                </Text>
-                <Box position="relative">
-                  <Box
-                    position="absolute"
-                    left={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                  >
-                    <FaLock color="gray.400" />
-                  </Box>
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Create a password"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    size="lg"
-                    pl={10}
-                    pr={12}
-                  />
-                  <Box
-                    position="absolute"
-                    right={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                    cursor="pointer"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <FaEyeSlash color="gray.400" /> : <FaEye color="gray.400" />}
-                  </Box>
-                </Box>
-                
-                {formData.password && (
-                  <Box mt={2}>
-                    <HStack justify="space-between" mb={1}>
-                      <Text fontSize="sm" color="gray.600">Password strength:</Text>
-                      <Text fontSize="sm" color={`${passwordStrength.color}.500`} fontWeight="bold">
-                        {passwordStrength.text}
-                      </Text>
-                    </HStack>
-                    <Box
-                      bg="gray.200"
-                      h={2}
-                      borderRadius="full"
-                      overflow="hidden"
-                    >
-                      <Box
-                        bg={`${passwordStrength.color}.500`}
-                        h="full"
-                        w={`${passwordStrength.score * 20}%`}
-                        transition="width 0.3s ease"
-                      />
-                    </Box>
-                  </Box>
-                )}
-                
-                {errors.password && (
-                  <Text color="red.500" fontSize="sm" mt={1}>
-                    {errors.password}
-                  </Text>
-                )}
-              </Box>
-
-              <Box>
-                <Text as="label" display="block" mb={2} fontWeight="medium" color="gray.700">
-                  Confirm Password
-                </Text>
-                <Box position="relative">
-                  <Box
-                    position="absolute"
-                    left={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                  >
-                    <FaLock color="gray.400" />
-                  </Box>
-                  <Input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    size="lg"
-                    pl={10}
-                    pr={12}
-                  />
-                  <Box
-                    position="absolute"
-                    right={3}
-                    top="50%"
-                    transform="translateY(-50%)"
-                    zIndex={1}
-                    cursor="pointer"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <FaEyeSlash color="gray.400" /> : <FaEye color="gray.400" />}
-                  </Box>
-                </Box>
-                {errors.confirmPassword && (
-                  <Text color="red.500" fontSize="sm" mt={1}>
-                    {errors.confirmPassword}
-                  </Text>
-                )}
-              </Box>
-
-              <Box>
-                <HStack gap={3}>
-                  <input
-                    type="checkbox"
-                    checked={formData.acceptTerms}
-                    onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
-                    style={{ width: '16px', height: '16px' }}
-                  />
-                  <Text fontSize="sm" color="gray.600">
-                    I agree to the{' '}
-                    <Text as="span" color="blue.500" cursor="pointer" _hover={{ textDecoration: 'underline' }}>
-                      Terms of Service
-                    </Text>{' '}
-                    and{' '}
-                    <Text as="span" color="blue.500" cursor="pointer" _hover={{ textDecoration: 'underline' }}>
-                      Privacy Policy
-                    </Text>
-                  </Text>
-                </HStack>
-                {errors.acceptTerms && (
-                  <Text color="red.500" fontSize="sm" mt={1}>
-                    {errors.acceptTerms}
-                  </Text>
-                )}
-              </Box>
-
-              <Button
-                type="submit"
-                colorScheme="blue"
-                size="lg"
-                width="full"
-                loading={isLoading}
-                loadingText="Creating Account..."
-              >
-                Create Account
-              </Button>
-            </VStack>
-          </form>
-
-          <HStack justify="space-between" fontSize="sm">
-            <Text color="gray.600">
-              Already have an account?{' '}
-              <RouterLink to="/auth/signin">
-                <Text color="blue.500" _hover={{ textDecoration: 'underline' }} cursor="pointer" display="inline">
-                  Sign In
-                </Text>
-              </RouterLink>
-            </Text>
-            <RouterLink to="/auth/signup/email-verification">
-              <Text color="blue.500" _hover={{ textDecoration: 'underline' }} cursor="pointer" display="inline">
-                Verify Email
+    <Box px={0} pt={6}>
+      <form onSubmit={handleSignUpSubmit}>
+        <VStack gap={5}>
+          <HStack gap={4} w="full">
+            <Box flex={1}>
+              <Text as="label" display="block" mb={2} fontWeight="semibold" color={textColor}>
+                First Name
               </Text>
-            </RouterLink>
+              <Box position="relative">
+                <Box
+                  position="absolute"
+                  left={4}
+                  top="50%"
+                  transform="translateY(-50%)"
+                  zIndex={1}
+                >
+                  <FaUser color="gray.400" />
+                </Box>
+                <Input
+                  type="text"
+                  placeholder="First name"
+                  value={signUpData.firstName}
+                  onChange={(e) => handleSignUpInputChange('firstName', e.target.value)}
+                  size="lg"
+                  pl={12}
+                  h="56px"
+                  borderRadius="xl"
+                  border="2px"
+                  borderColor="gray.200"
+                  _focus={{
+                    borderColor: "blue.500",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)"
+                  }}
+                  _hover={{ borderColor: "gray.300" }}
+                  className="input-field"
+                />
+              </Box>
+              {signUpErrors.firstName && (
+                <Text color="red.500" fontSize="sm" mt={2}>
+                  {signUpErrors.firstName}
+                </Text>
+              )}
+            </Box>
+
+            <Box flex={1}>
+              <Text as="label" display="block" mb={2} fontWeight="semibold" color={textColor}>
+                Last Name
+              </Text>
+              <Input
+                type="text"
+                placeholder="Last name"
+                value={signUpData.lastName}
+                onChange={(e) => handleSignUpInputChange('lastName', e.target.value)}
+                size="lg"
+                h="56px"
+                borderRadius="xl"
+                border="2px"
+                borderColor="gray.200"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)"
+                }}
+                _hover={{ borderColor: "gray.300" }}
+                className="input-field"
+              />
+              {signUpErrors.lastName && (
+                <Text color="red.500" fontSize="sm" mt={2}>
+                  {signUpErrors.lastName}
+                </Text>
+              )}
+            </Box>
           </HStack>
 
-          <Box borderTop="1px" borderColor="gray.200" pt={6} />
-
-          <VStack gap={3}>
-            <Text fontSize="sm" color="gray.600">
-              Or sign up with
+          <Box w="full">
+            <Text as="label" display="block" mb={2} fontWeight="semibold" color={textColor}>
+              Email Address
             </Text>
+            <Box position="relative">
+              <Box
+                position="absolute"
+                left={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
+              >
+                <FaEnvelope color="gray.400" />
+              </Box>
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={signUpData.email}
+                onChange={(e) => handleSignUpInputChange('email', e.target.value)}
+                size="lg"
+                pl={12}
+                h="56px"
+                borderRadius="xl"
+                border="2px"
+                borderColor="gray.200"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)"
+                }}
+                _hover={{ borderColor: "gray.300" }}
+                className="input-field"
+              />
+            </Box>
+            {signUpErrors.email && (
+              <Text color="red.500" fontSize="sm" mt={2}>
+                {signUpErrors.email}
+              </Text>
+            )}
+          </Box>
+
+          <Box w="full">
+            <Text as="label" display="block" mb={2} fontWeight="semibold" color={textColor}>
+              Password
+            </Text>
+            <Box position="relative">
+              <Box
+                position="absolute"
+                left={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
+              >
+                <FaLock color="gray.400" />
+              </Box>
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Create a password"
+                value={signUpData.password}
+                onChange={(e) => handleSignUpInputChange('password', e.target.value)}
+                size="lg"
+                pl={12}
+                pr={12}
+                h="56px"
+                borderRadius="xl"
+                border="2px"
+                borderColor="gray.200"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)"
+                }}
+                _hover={{ borderColor: "gray.300" }}
+                className="input-field"
+              />
+              <Box
+                position="absolute"
+                right={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
+                cursor="pointer"
+                onClick={() => setShowPassword(!showPassword)}
+                p={2}
+                borderRadius="md"
+                _hover={{ bg: "gray.100" }}
+              >
+                {showPassword ? <FaEyeSlash color="gray.400" /> : <FaEye color="gray.400" />}
+              </Box>
+            </Box>
             
-            <HStack gap={4} width="full">
-              <Button
-                variant="outline"
-                size="lg"
-                width="full"
-                onClick={handleGoogleSignUp}
+            {signUpData.password && (
+              <Box mt={3}>
+                <HStack justify="space-between" mb={2}>
+                  <Text fontSize="sm" color={subtextColor}>Password strength:</Text>
+                  <Text fontSize="sm" color={`${passwordStrength.color}.500`} fontWeight="bold">
+                    {passwordStrength.text}
+                  </Text>
+                </HStack>
+                <Box
+                  bg="gray.200"
+                  h={2}
+                  borderRadius="full"
+                  overflow="hidden"
+                  className="password-strength-bar"
+                >
+                  <Box
+                    bg={`${passwordStrength.color}.500`}
+                    h="full"
+                    w={`${passwordStrength.score * 20}%`}
+                    transition="width 0.3s ease"
+                    className="password-strength-fill"
+                  />
+                </Box>
+              </Box>
+            )}
+            
+            {signUpErrors.password && (
+              <Text color="red.500" fontSize="sm" mt={2}>
+                {signUpErrors.password}
+              </Text>
+            )}
+          </Box>
+
+          <Box w="full">
+            <Text as="label" display="block" mb={2} fontWeight="semibold" color={textColor}>
+              Confirm Password
+            </Text>
+            <Box position="relative">
+              <Box
+                position="absolute"
+                left={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
               >
-                <FaGoogle style={{ marginRight: '8px' }} />
-                Google
-              </Button>
-              <Button
-                variant="outline"
+                <FaLock color="gray.400" />
+              </Box>
+              <Input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirm your password"
+                value={signUpData.confirmPassword}
+                onChange={(e) => handleSignUpInputChange('confirmPassword', e.target.value)}
                 size="lg"
-                width="full"
-                onClick={handleFacebookSignUp}
+                pl={12}
+                pr={12}
+                h="56px"
+                borderRadius="xl"
+                border="2px"
+                borderColor="gray.200"
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)"
+                }}
+                _hover={{ borderColor: "gray.300" }}
+                className="input-field"
+              />
+              <Box
+                position="absolute"
+                right={4}
+                top="50%"
+                transform="translateY(-50%)"
+                zIndex={1}
+                cursor="pointer"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                p={2}
+                borderRadius="md"
+                _hover={{ bg: "gray.100" }}
               >
-                <FaFacebook style={{ marginRight: '8px' }} />
-                Facebook
-              </Button>
+                {showConfirmPassword ? <FaEyeSlash color="gray.400" /> : <FaEye color="gray.400" />}
+              </Box>
+            </Box>
+            {signUpErrors.confirmPassword && (
+              <Text color="red.500" fontSize="sm" mt={2}>
+                {signUpErrors.confirmPassword}
+              </Text>
+            )}
+          </Box>
+
+          <Box w="full">
+            <HStack gap={3}>
+              <input
+                type="checkbox"
+                checked={signUpData.acceptTerms}
+                onChange={(e) => handleSignUpInputChange('acceptTerms', e.target.checked)}
+                style={{ width: '16px', height: '16px' }}
+              />
+              <Text fontSize="sm" color={subtextColor}>
+                I agree to the{' '}
+                <Text as="span" color="blue.500" cursor="pointer" _hover={{ textDecoration: 'underline' }}>
+                  Terms of Service
+                </Text>{' '}
+                and{' '}
+                <Text as="span" color="blue.500" cursor="pointer" _hover={{ textDecoration: 'underline' }}>
+                  Privacy Policy
+                </Text>
+              </Text>
             </HStack>
-          </VStack>
+            {signUpErrors.acceptTerms && (
+              <Text color="red.500" fontSize="sm" mt={2}>
+                {signUpErrors.acceptTerms}
+              </Text>
+            )}
+          </Box>
+
+          <Button
+            type="submit"
+            colorScheme="blue"
+            size="lg"
+            width="full"
+            h="56px"
+            borderRadius="xl"
+            fontSize="lg"
+            fontWeight="semibold"
+            loading={isSignUpLoading}
+            loadingText="Creating Account..."
+            _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
+            transition="all 0.2s"
+          >
+            Create Account
+          </Button>
         </VStack>
-      </Box>
-    </Container>
+      </form>
+    </Box>
   );
 };
 
