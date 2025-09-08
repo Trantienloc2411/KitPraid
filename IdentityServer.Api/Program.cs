@@ -1,5 +1,6 @@
 using IdentityServer.Domain.Entities;
 using IdentityServer.Infrastructure.Configuration;
+using IdentityServer.Infrastructure.Data;
 using IdentityServer.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ namespace IdentityServer.Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,12 @@ public class Program
         
         var app = builder.Build();
         
+        
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            await Seeder.SeedRolesAsync(services);
+        }        
         app.UseRouting();
         app.UseCors("AllowFrontEnd");
         app.UseIdentityServer();
