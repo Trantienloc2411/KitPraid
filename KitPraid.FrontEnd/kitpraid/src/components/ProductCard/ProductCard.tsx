@@ -54,10 +54,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(price);
+    // For Vietnamese prices, we'll use a more compact format
+    if (price >= 1000000) {
+      return `${(price / 1000000).toFixed(1)}M ₫`;
+    } else if (price >= 1000) {
+      return `${(price / 1000).toFixed(0)}K ₫`;
+    } else {
+      return `${price} ₫`;
+    }
   };
 
   const cardClasses = [
@@ -133,9 +137,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Price */}
         <div className="product-price">
-          <span className="current-price">{formatPrice(price)}</span>
+          <span className="current-price" title={formatPrice(price)}>
+            {formatPrice(price)}
+          </span>
           {originalPrice && (
-            <span className="original-price">{formatPrice(originalPrice)}</span>
+            <span className="original-price" title={formatPrice(originalPrice)}>
+              {formatPrice(originalPrice)}
+            </span>
           )}
         </div>
 

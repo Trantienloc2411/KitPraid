@@ -177,7 +177,8 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(251, 191, 36, 0.2);
   max-width: 280px;
-  animation: float 6s ease-in-out infinite;
+  /* Disable floating/rotation animation */
+  animation: none;
 }
 
 .floating-card-1 {

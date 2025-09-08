@@ -16,7 +16,6 @@ export const useCountdown = (targetDate: Date): CountdownTime => {
   });
 
   useEffect(() => {
-    console.log('useCountdown hook initialized with target date:', targetDate);
     
     const updateCountdown = () => {
       const now = new Date();
@@ -30,10 +29,8 @@ export const useCountdown = (targetDate: Date): CountdownTime => {
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         
         const newCountdown = { days, hours, minutes, seconds };
-        console.log('Countdown updated:', newCountdown);
         setCountdown(newCountdown);
       } else {
-        console.log('Countdown finished');
         setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     };
@@ -45,7 +42,6 @@ export const useCountdown = (targetDate: Date): CountdownTime => {
     const interval = setInterval(updateCountdown, 1000);
     
     return () => {
-      console.log('Cleaning up countdown interval');
       clearInterval(interval);
     };
   }, [targetDate]);

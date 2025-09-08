@@ -1,17 +1,16 @@
 import React from 'react';
-import { VStack, SimpleGrid, Box, Heading, Text, HStack, Link } from '@chakra-ui/react';
-import HeroSection from '../../components/HeroSection';
-import ProductCard from '../../components/ProductCard';
-import CountdownTimer from '../../components/CountdownTimer/CountdownTimer';
+import HeroSection from './components/HeroSection';
 import './Home.css';
-import { FaArrowRight } from 'react-icons/fa';
+import FeatureSection from './components/FeatureSection/FeatureSection';
+import BestDealSection from './components/BestDealSection/BestDealSection';
+import { CategoryListSection } from './components/CategoryListSection';
 
 const Home: React.FC = () => {
   // Set target date to 3 days from now
   const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate () + 3);
-  
-  console.log('Home component - Target date set to:', targetDate);
+  targetDate.setDate(targetDate.getDate() + 3);
+
+   
 
   // Mock data for demo
   const heroData = {
@@ -64,72 +63,63 @@ const Home: React.FC = () => {
     }
   ];
 
-  const handleAddToCart = (id: string) => {
-    console.log('Added to cart:', id);
-  };
-
-  const handleAddToWishlist = (id: string) => {
-    console.log('Added to wishlist:', id);
-  };
-
-  const handleQuickView = (id: string) => {
-    console.log('Quick view:', id);
-  };
+  const categories = [
+    {
+      id: '1',
+      name: 'Computer & Laptop',
+      image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&h=200&fit=crop',
+      description: 'High-performance computers and laptops'
+    },
+    {
+      id: '2',
+      name: 'SmartPhone',
+      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=200&fit=crop',
+      description: 'Latest smartphones and mobile devices'
+    },
+    {
+      id: '3',
+      name: 'Headphones',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=200&fit=crop',
+      description: 'Premium audio headphones and earbuds'
+    },
+    {
+      id: '4',
+      name: 'Accessories',
+      image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=300&h=200&fit=crop',
+      description: 'Essential tech accessories and peripherals'
+    },
+    {
+      id: '5',
+      name: 'Camera & Photo',
+      image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300&h=200&fit=crop',
+      description: 'Professional cameras and photography gear'
+    },
+    {
+      id: '6',
+      name: 'TV & Homes',
+      image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=300&h=200&fit=crop',
+      description: 'Smart TVs and home entertainment systems'
+    },
+    {
+      id: '7',
+      name: 'Gaming',
+      image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&h=200&fit=crop',
+      description: 'Gaming consoles and accessories'
+    },
+    {
+      id: '8',
+      name: 'Wearables',
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=200&fit=crop',
+      description: 'Smartwatches and fitness trackers'
+    }
+  ];
 
   return (
     <div className="home-page">
       <HeroSection {...heroData} />
-
-      {/* Featured Products Section */}
-      <section className="featured-products">
-        <Box maxW="1200px" mx="auto">
-          <VStack gap={8} mb={12}>
-            <Heading size="2xl" textAlign="center" color="gray.800">
-              Featured Products
-            </Heading>
-            <Text fontSize="lg" color="gray.600" textAlign="center" maxW="600px">
-              Discover our handpicked selection of premium products that combine quality, style, and innovation.
-            </Text>
-          </VStack>
-
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={8}>
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...product}
-                onAddToCart={handleAddToCart}
-                onAddToWishlist={handleAddToWishlist}
-                onQuickView={handleQuickView}
-              />
-            ))}
-          </SimpleGrid>
-        </Box>
-      </section>
-
-      {/* Best Deals Section */}
-      <section className="best-deals">
-        <Box maxW="1200px" mx="auto">
-          <VStack gap={8} mb={4} align="flex-start">
-            <HStack justify="flex-start" w="100%" align="center" alignItems="center">
-              <Heading size="2xl" textAlign="left" paddingRight="0.4rem" fontWeight="bold" color="gray.800">
-                Best Deals
-              </Heading>
-              <CountdownTimer className="countdown-timer" targetDate={targetDate} />
-              <Link ml="auto" gap={4} fontWeight="bold" href="/deals" color="blue.500" fontSize="lg">Browse All Deals <FaArrowRight /></Link>
-            </HStack>
-            <Text fontSize="lg" color="gray.600" textAlign="left">
-              Discover our best deals on premium products that combine quality, style, and innovation.
-            </Text>
-          </VStack>
-          
-          {/* Best Deals Products */}
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={8}>
-            {products.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </SimpleGrid>
-        </Box>
-      </section>
+      <BestDealSection products={products} targetDate={targetDate} />
+      <CategoryListSection categories={categories} />
+      <FeatureSection products={products} />
     </div>
   );
 };
