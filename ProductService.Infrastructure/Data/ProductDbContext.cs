@@ -5,7 +5,7 @@ namespace ProductService.Infrastructure.Data;
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext() {}
+    public ProductDbContext(DbContextOptions<DbContext> optionsBuilderOptions) {}
     
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) {}
     
@@ -22,6 +22,11 @@ public class ProductDbContext : DbContext
         modelBuilder.Entity<Product>().HasOne(e => e.Brand).WithMany(e => e.Products).HasForeignKey(e => e.BrandId);
         modelBuilder.Entity<Product>().HasMany(e => e.Images).WithOne(e => e.Product).HasForeignKey(e => e.ProductId);
         
+        
+        modelBuilder.Entity<Product>().Ignore(e => e.Attributes);
+        
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProductDbContext).Assembly);
     }
     
 }
