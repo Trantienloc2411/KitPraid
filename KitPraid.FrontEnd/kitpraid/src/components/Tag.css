@@ -1,0 +1,124 @@
+/* Tag Component Styles - Footer Design */
+.tag {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  max-width: fit-content;
+  min-width: fit-content;
+  white-space: nowrap;
+  text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Default tag styling */
+.tag {
+  background-color: #343a40;
+  color: #ffffff;
+  border: 1px solid #495057;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover effect */
+.tag:hover {
+  background-color: #495057;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Selected state - Orange (#fbbf24) */
+.tag.selected {
+  background-color: #fbbf24;
+  border-color: #fbbf24;
+  color: #000000;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+}
+
+/* Highlighted state (dashed border) - Orange (#fbbf24) */
+.tag.highlighted {
+  border: 2px dashed #fbbf24;
+  background-color: #343a40;
+  color: #ffffff;
+}
+
+.tag.highlighted:hover {
+  background-color: #fbbf24;
+  border-color: #fbbf24;
+  color: #000000;
+}
+
+/* Active/clicked state */
+.tag:active {
+  transform: translateY(0);
+  transition: all 0.1s ease;
+}
+
+/* Focus state for accessibility - Orange (#fbbf24) */
+.tag:focus {
+  outline: 2px solid rgba(251, 191, 36, 0.5);
+  outline-offset: 2px;
+}
+
+/* Prevent text overflow */
+.tag * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tag {
+    font-size: 0.7rem;
+    padding: 6px 10px;
+    margin: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tag {
+    font-size: 0.65rem;
+    padding: 5px 8px;
+    margin: 1px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tag {
+    background-color: #343a40;
+    border-color: #495057;
+    color: #ffffff;
+  }
+  
+  .tag:hover {
+    background-color: #495057;
+  }
+}
+
+/* Ensure tags don't overflow containers */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Tag grid layout for footer */
+.tag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
+}
