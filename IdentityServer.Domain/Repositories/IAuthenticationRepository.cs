@@ -1,4 +1,4 @@
-﻿using IdentityServer.Domain.Entities;
+using IdentityServer.Domain.Entities;
 
 namespace IdentityServer.Domain.Repositories;
 

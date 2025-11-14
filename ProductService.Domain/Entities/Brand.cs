@@ -12,12 +12,11 @@ public class Brand
     [StringLength(50)]
     public required string BrandName {get; set;}
     public required string BrandDescription {get; set;}
-    
+    [Required]
+    [Url]
     public required string BrandImage {get; set;}
     public DateTime DateCreated {get; set;}
     public DateTime DateModified {get; set;}
-    
-    public Guid CategoryId {get; set;}
     
     public bool IsActive {get; set;}
     public bool IsDeleted {get; set;}

@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace IdentityServer.UI.Pages.Account;
 
-public class Register : PageModel
+public class AccessDeniedModel : PageModel
 {
     public void OnGet()
     {
-        
     }
 }
+

@@ -46,9 +46,6 @@ namespace ProductService.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -73,9 +70,8 @@ namespace ProductService.Infrastructure.Migrations
                             BrandDescription = "High quality peripherals and accessories",
                             BrandImage = "logitech.png",
                             BrandName = "Logitech",
-                            CategoryId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                            DateCreated = new DateTime(2025, 9, 25, 9, 24, 27, 484, DateTimeKind.Utc).AddTicks(1821),
-                            DateModified = new DateTime(2025, 9, 25, 9, 24, 27, 484, DateTimeKind.Utc).AddTicks(1983),
+                            DateCreated = new DateTime(2025, 11, 18, 10, 22, 31, 651, DateTimeKind.Utc).AddTicks(8417),
+                            DateModified = new DateTime(2025, 11, 18, 10, 22, 31, 651, DateTimeKind.Utc).AddTicks(8647),
                             IsActive = true,
                             IsDeleted = false
                         },
@@ -86,9 +82,8 @@ namespace ProductService.Infrastructure.Migrations
                             BrandDescription = "Premium customizable mechanical keyboards",
                             BrandImage = "keychron.png",
                             BrandName = "Keychron",
-                            CategoryId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb"),
-                            DateCreated = new DateTime(2025, 9, 25, 9, 24, 27, 484, DateTimeKind.Utc).AddTicks(2558),
-                            DateModified = new DateTime(2025, 9, 25, 9, 24, 27, 484, DateTimeKind.Utc).AddTicks(2559),
+                            DateCreated = new DateTime(2025, 11, 18, 10, 22, 31, 651, DateTimeKind.Utc).AddTicks(9161),
+                            DateModified = new DateTime(2025, 11, 18, 10, 22, 31, 651, DateTimeKind.Utc).AddTicks(9162),
                             IsActive = true,
                             IsDeleted = false
                         });
@@ -165,6 +160,9 @@ namespace ProductService.Infrastructure.Migrations
                     b.Property<Guid>("BrandId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CategoryId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -174,8 +172,11 @@ namespace ProductService.Infrastructure.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("Modified")
+                    b.Property<DateTime?>("Modified")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<string>("ProductDescription")
                         .IsRequired()
@@ -207,10 +208,12 @@ namespace ProductService.Infrastructure.Migrations
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AttributesJson = "{\"Color\":\"Gray\",\"Switch\":\"Tactile Quiet\",\"Layout\":\"US\"}",
                             BrandId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Created = new DateTime(2025, 9, 25, 9, 24, 27, 485, DateTimeKind.Utc).AddTicks(4776),
+                            CategoryId = "",
+                            Created = new DateTime(2025, 11, 18, 10, 22, 31, 653, DateTimeKind.Utc).AddTicks(7596),
                             IsActive = true,
                             IsDeleted = false,
-                            Modified = new DateTime(2025, 9, 25, 9, 24, 27, 485, DateTimeKind.Utc).AddTicks(4919),
+                            Modified = new DateTime(2025, 11, 18, 10, 22, 31, 653, DateTimeKind.Utc).AddTicks(7793),
+                            Price = 836.12,
                             ProductDescription = "Low-profile mechanical keyboard with quiet tactile switches.",
                             ProductName = "Logitech MX Mechanical Keyboard",
                             Sku = "LOGI-MX-KEY",
@@ -222,10 +225,12 @@ namespace ProductService.Infrastructure.Migrations
                             Id = new Guid("22222222-2222-2222-2222-333333333333"),
                             AttributesJson = "{\"Color\":\"Black\",\"Switch\":\"Gateron Brown\",\"Connectivity\":\"Bluetooth 5.1\"}",
                             BrandId = new Guid("11111111-1111-1111-1111-222222222222"),
-                            Created = new DateTime(2025, 9, 25, 9, 24, 27, 485, DateTimeKind.Utc).AddTicks(5285),
+                            CategoryId = "",
+                            Created = new DateTime(2025, 11, 18, 10, 22, 31, 653, DateTimeKind.Utc).AddTicks(8308),
                             IsActive = true,
                             IsDeleted = false,
-                            Modified = new DateTime(2025, 9, 25, 9, 24, 27, 485, DateTimeKind.Utc).AddTicks(5286),
+                            Modified = new DateTime(2025, 11, 18, 10, 22, 31, 653, DateTimeKind.Utc).AddTicks(8308),
+                            Price = 0.0,
                             ProductDescription = "Hot-swappable wireless mechanical keyboard with RGB backlight.",
                             ProductName = "Keychron K8 Pro",
                             Sku = "KEYC-K8PRO",
@@ -237,10 +242,12 @@ namespace ProductService.Infrastructure.Migrations
                             Id = new Guid("22222222-2222-2222-2222-444444444444"),
                             AttributesJson = "{\"Color\":\"White\",\"DPI\":\"25600\",\"Buttons\":\"13\"}",
                             BrandId = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Created = new DateTime(2025, 9, 25, 9, 24, 27, 485, DateTimeKind.Utc).AddTicks(5289),
+                            CategoryId = "",
+                            Created = new DateTime(2025, 11, 18, 10, 22, 31, 653, DateTimeKind.Utc).AddTicks(8311),
                             IsActive = true,
                             IsDeleted = false,
-                            Modified = new DateTime(2025, 9, 25, 9, 24, 27, 485, DateTimeKind.Utc).AddTicks(5290),
+                            Modified = new DateTime(2025, 11, 18, 10, 22, 31, 653, DateTimeKind.Utc).AddTicks(8311),
+                            Price = 0.0,
                             ProductDescription = "Wireless gaming mouse with LIGHTSPEED and LIGHTSYNC RGB.",
                             ProductName = "Logitech G502 X Plus Mouse",
                             Sku = "LOGI-G502X",

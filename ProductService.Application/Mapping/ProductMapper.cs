@@ -5,19 +5,58 @@ namespace ProductService.Infrastructure.Mapping;
 
 public class ProductMapper
 {
-    public static Product ToProduct(CreateProductDtos product)
+    public static Product ToCreateProduct(CreateProductDto dto)
     {
-       
         return new Product
         {
-            ProductName = product.ProductName,
-            ProductDescription = product.ProductDescription,
-            Price = product.Price,
-            Sku = product.Sku,
-            BrandId = product.BrandId,
-
-
-
+            Id = Guid.NewGuid(), // or let DB generate
+            ProductName = dto.ProductName,
+            ProductDescription = dto.ProductDescription,
+            Price = dto.Price,
+            Sku = dto.Sku,
+            BrandId = dto.BrandId,
+            CategoryId = dto.CategoryId,   // IMPORTANT if category is required
+            Stock = dto.Stock,
+            IsActive = dto.IsActive,
+            IsDeleted = false,
+            Created = DateTime.UtcNow,
+            Modified = DateTime.UtcNow,
+            UserId = dto.UserId,
+            Attributes = dto.Attributes
         };
     }
+    
+    public static void ApplyUpdate(Product product, UpdateProductDto dto)
+    {
+        // Only update fields that are provided (not null)
+
+        if (!string.IsNullOrWhiteSpace(dto.ProductName))
+            product.ProductName = dto.ProductName;
+
+        if (!string.IsNullOrWhiteSpace(dto.ProductDescription))
+            product.ProductDescription = dto.ProductDescription;
+
+        if (dto.BrandId.HasValue)
+            product.BrandId = dto.BrandId.Value;
+
+        if (dto.Price > 0)
+            product.Price = dto.Price;
+
+        if (dto.Stock >= 0)
+            product.Stock = dto.Stock;
+
+        if (!string.IsNullOrWhiteSpace(dto.CategoryId))
+            product.CategoryId = dto.CategoryId;
+
+        if (dto.IsActive.HasValue)
+            product.IsActive = dto.IsActive.Value;
+
+        // Attributes (JSON column)
+        if (dto.Attributes is not null)
+            product.Attributes = dto.Attributes;
+
+        // Always update Modified timestamp
+        product.Modified = DateTime.UtcNow;
+    }
+
 }

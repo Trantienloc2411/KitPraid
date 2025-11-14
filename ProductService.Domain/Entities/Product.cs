@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace ProductService.Domain.Entities;
@@ -24,6 +26,9 @@ public class Product
 
     [DefaultValue(0.0)]
     public double Price { get; set; } = 0.0;
+    
+    [AllowNull]
+    public string? CategoryId { get; set; } = "";
 
     public bool? IsActive { get; set; }
     public bool? IsDeleted { get; set; }
@@ -31,6 +36,7 @@ public class Product
     public virtual Brand? Brand { get; set; }
 
     public DateTime Created { get; set; }
-    public DateTime Modified { get; set; }
+    [AllowNull]
+    public DateTime? Modified { get; set; }
     public Guid UserId { get; set; }
 }

@@ -21,7 +21,6 @@ public class BrandConfiguration : IEntityTypeConfiguration<Brand>
                 BrandImage = "logitech.png",
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow,
-                CategoryId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                 IsActive = true,
                 IsDeleted = false
             },
@@ -34,7 +33,6 @@ public class BrandConfiguration : IEntityTypeConfiguration<Brand>
                 BrandImage = "keychron.png",
                 DateCreated = DateTime.UtcNow,
                 DateModified = DateTime.UtcNow,
-                CategoryId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb"),
                 IsActive = true,
                 IsDeleted = false
             }

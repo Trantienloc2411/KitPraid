@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getColor } from "../theme/colors";
 import Tabs from "../components/Tabs";
 import Input from "../components/Input";
@@ -12,10 +12,37 @@ import { authService } from "../services/auth";
 const Authorization = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // View states: 'signin' | 'signup' | 'forgetPassword' | 'resetPassword' | 'verifyEmail'
   const [currentView, setCurrentView] = useState("signin");
   const [activeTab, setActiveTab] = useState("signin");
+
+  // Auto-redirect to IdentityServer Razor UI when accessing signin view
+  useEffect(() => {
+    const viewParam = searchParams.get("view");
+    const initialView = viewParam || "signin";
+    
+    // Set initial view from URL params
+    if (viewParam) {
+      setCurrentView(initialView);
+      setActiveTab(initialView);
+    }
+    
+    // Only redirect if on signin view and not authenticated
+    if (initialView === "signin") {
+      // Check if user is already authenticated (has token)
+      const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+      if (!token) {
+        // Not authenticated, redirect to IdentityServer Razor UI login page immediately
+        // This ensures login form is always shown on Razor page, not React
+        authService.redirectToLogin();
+      } else {
+        // Already authenticated, redirect to home
+        navigate("/", { replace: true });
+      }
+    }
+  }, []); // Only run once on mount
 
   // Form states
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });
@@ -267,24 +294,8 @@ const Authorization = () => {
         variant="primary"
         size="lg"
         onClick={() => {
-          authService
-            .login({
-              username: signInForm.email,
-              password: signInForm.password,
-              grant_type: "password",
-              client_id: "postman-client",
-              client_secret: "secret",
-              scope: "openid profile email roles",
-            })
-            .then((response) => {
-              console.log("Login Response:", response);
-              localStorage.setItem("authToken", response.access_token);
-              navigate("/");
-            })
-            .catch((error) => {
-              console.error("Login Error:", error);
-              toast.error(error.response.data.error_description);
-            });
+          // Redirect to IdentityServer Razor UI login page
+          authService.redirectToLogin();
         }}
         style={{ width: "100%", marginTop: "0.5rem" }}
       />

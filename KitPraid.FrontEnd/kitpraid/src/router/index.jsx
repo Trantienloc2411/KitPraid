@@ -9,6 +9,9 @@ import {
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../pages/HomePage";
 import Authorization from "../pages/Authorization";
+import Callback from "../pages/Callback";
+import Login from "../pages/Login";
+import OAuthCallback from "../pages/OAuthCallback";
 
 /**
  * Layout Route Wrapper
@@ -62,9 +65,14 @@ const Router = () => {
         <Route
           element={<LayoutRoute showNavigation={false} showFooter={false} />}
         >
+          {/* OAuth Callback - handles redirect from IdentityServer */}
+          <Route path="/callback" element={<Callback />} />
+          {/* New OAuth2 Callback with PKCE and error logging */}
+          <Route path="/oauth-callback" element={<OAuthCallback />} />
+          {/* Login Page - initiates OAuth flow */}
+          <Route path="/login" element={<Login />} />
           {/* Add more routes without Navigation here */}
           {/* Example:
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           */}
         </Route>

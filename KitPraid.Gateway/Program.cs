@@ -14,7 +14,7 @@ public class Program
             .AddJwtBearer("Bearer", options =>
             {
                 options.Authority = builder.Configuration["Authority"];
-                options.TokenValidationParameters.ValidateAudience = false;
+                options.TokenValidationParameters.ValidateAudience = true;
             });
         
         builder.Services.AddAuthorization();
