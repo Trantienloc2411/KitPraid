@@ -9,7 +9,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 {
     public Task<Product> CreateProductAsync(Product product)
     {
-        throw new NotImplementedException();
+        return productRepository.AddProductAsync(product);
     }
 
     public Task<bool> DeleteProductAsync(string id)

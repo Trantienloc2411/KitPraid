@@ -1,7 +1,8 @@
 ﻿using Duende.IdentityServer.Models;
 
 namespace IdentityServer.Infrastructure.Mapping;
-using DomainClient = IdentityServer.Domain.Entities.Client;
+
+using DomainClient = Domain.Entities.Client;
 using IdentityServerClient = Client;
 public static class ClientMapper
 {

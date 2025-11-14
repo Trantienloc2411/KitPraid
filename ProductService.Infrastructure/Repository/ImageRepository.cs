@@ -4,7 +4,7 @@ using ProductService.Infrastructure.Data;
 
 namespace ProductService.Infrastructure.Repository;
 
-public class ImageRepository (ProductDbContext productDbContext) : IImageRepository
+public class ImageRepository(ProductDbContext productDbContext) : IImageRepository
 {
     private readonly ProductDbContext _dbContext;
 
@@ -25,22 +25,13 @@ public class ImageRepository (ProductDbContext productDbContext) : IImageReposit
 
     public async Task<Image> GetImageAsync(Guid imageId)
     {
-        var image = await _dbContext.Images.FindAsync(imageId);
-        if (image == null)
-        {
-            throw new InvalidOperationException($"Image with ID {imageId} not found.");
-        }
+        var image = await _dbContext.Images.FindAsync(imageId) ?? throw new InvalidOperationException($"Image with ID {imageId} not found.");
         return image;
     }
 
     public async Task<Image> UpdateImageAsync(Image image)
     {
-        var existingImage = await _dbContext.Images.FindAsync(image.Id);
-        if (existingImage == null)
-        {
-            throw new InvalidOperationException($"Image with ID {image.Id} not found.");
-        }
-
+        var existingImage = await _dbContext.Images.FindAsync(image.Id) ?? throw new InvalidOperationException($"Image with ID {image.Id} not found.");
         existingImage.ImagePath = image.ImagePath;
         existingImage.ProductId = image.ProductId;
         existingImage.IsDeleted = image.IsDeleted;

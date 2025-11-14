@@ -14,8 +14,6 @@ public class Product
 
     // Backing JSON column
     public string? AttributesJson { get; set; }
-
-
     public Dictionary<string, object?>? Attributes
     {
         get => string.IsNullOrEmpty(AttributesJson)
@@ -25,7 +23,7 @@ public class Product
     }
 
     [DefaultValue(0.0)]
-    public double Price { get; set; } = 0.0m;
+    public double Price { get; set; } = 0.0;
 
     public bool? IsActive { get; set; }
     public bool? IsDeleted { get; set; }

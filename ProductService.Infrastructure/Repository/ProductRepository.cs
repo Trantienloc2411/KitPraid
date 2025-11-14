@@ -60,5 +60,20 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
             .ToList();
         return new PageResult<Product>(products, totalCount, pageRequest.Page, pageRequest.Size);
     }
-    
+
+    public async Task<Product?> AddProductAsync(Product product)
+    {
+        try
+        {
+            await context.Products.AddAsync(product);
+            await context.SaveChangesAsync();
+            var result =  context.Products.Where(c => c.Id == product.Id).Include(b => b.Brand).Include(i => i.Images);
+            return result.FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

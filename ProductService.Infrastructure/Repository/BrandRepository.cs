@@ -16,7 +16,7 @@ public class BrandRepository : IBrandRepository
         var brands = await _dbContext.Brands
             .Skip((pageRequest.Page - 1) * pageRequest.Size)
             .Take(pageRequest.Size)
-            .ToListAsync();  
+            .ToListAsync();
         return new PageResult<Brand>(brands, totalRecords, pageRequest.Page, pageRequest.Size);
     }
 
@@ -39,11 +39,7 @@ public class BrandRepository : IBrandRepository
 
     public async Task<Brand> GetBrandAsync(Guid brandId)
     {
-        var brand = await _dbContext.Brands.FindAsync(brandId);
-        if (brand == null)
-        {
-            throw new InvalidOperationException($"Brand with ID {brandId} not found.");
-        }
+        var brand = await _dbContext.Brands.FindAsync(brandId) ?? throw new InvalidOperationException($"Brand with ID {brandId} not found.");
         return brand;
     }
 
@@ -56,11 +52,7 @@ public class BrandRepository : IBrandRepository
 
     public async Task<Brand> DeleteBrandAsync(Guid brandId)
     {
-        var brand = await _dbContext.Brands.FindAsync(brandId);
-        if (brand == null)
-        {
-            throw new InvalidOperationException($"Brand with ID {brandId} not found.");
-        }
+        var brand = await _dbContext.Brands.FindAsync(brandId) ?? throw new InvalidOperationException($"Brand with ID {brandId} not found.");
         brand.IsDeleted = true;
         await _dbContext.SaveChangesAsync();
         return brand;
@@ -68,12 +60,7 @@ public class BrandRepository : IBrandRepository
 
     public async Task<Brand> UpdateBrandAsync(Brand brand)
     {
-        var existingBrand = await _dbContext.Brands.FindAsync(brand.Id);
-        if (existingBrand == null)
-        {
-            throw new InvalidOperationException($"Brand with ID {brand.Id} not found.");
-        }
-
+        var existingBrand = await _dbContext.Brands.FindAsync(brand.Id) ?? throw new InvalidOperationException($"Brand with ID {brand.Id} not found.");
         existingBrand.BrandName = brand.BrandName;
         existingBrand.IsDeleted = brand.IsDeleted;
 
