@@ -1,4 +1,6 @@
-﻿using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Models;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 
 namespace IdentityServer.Infrastructure.Configuration;
@@ -23,7 +25,10 @@ public static class Config
         new ApiScope("web", "Website")
     ];
 
-    public static IEnumerable<Client> Clients =>
+    /// <summary>
+    /// Get clients configuration with support for dynamic ports from configuration
+    /// </summary>
+    public static IEnumerable<Client> GetClients(IConfiguration? configuration = null) =>
     [
         new Client
         {
@@ -78,7 +83,104 @@ public static class Config
             RequireClientSecret = true,           // client must provide secret (or use PKCE)
             RequirePkce = true,                   // enforce PKCE (recommended for browser/mobile apps)
             AllowPlainTextPkce = false,           // enforce secure PKCE
+        },
+        GetReactClient(configuration)
+    ];
+
+    /// <summary>
+    /// Get react-client configuration with dynamic port support
+    /// Supports reading from configuration or using default ports
+    /// </summary>
+    private static Client GetReactClient(IConfiguration? configuration)
+    {
+        // Default ports for common scenarios
+        var defaultRedirectUris = new List<string>
+        {
+            "http://localhost:3000/callback",
+            "http://localhost:5173/callback"
+        };
+
+        var defaultPostLogoutUris = new List<string>
+        {
+            "http://localhost:3000/",
+            "http://localhost:5173/"
+        };
+
+        var defaultCorsOrigins = new List<string>
+        {
+            "http://localhost:3000",
+            "http://localhost:5173"
+        };
+
+        // Read additional ports from configuration
+        if (configuration != null)
+        {
+            // Read from IdentityServer:ReactClient:RedirectUris array
+            var configRedirectUris = configuration.GetSection("IdentityServer:ReactClient:RedirectUris")
+                .Get<string[]>();
+            if (configRedirectUris != null && configRedirectUris.Length > 0)
+            {
+                defaultRedirectUris.AddRange(configRedirectUris);
+            }
+
+            // Read from IdentityServer:ReactClient:PostLogoutRedirectUris array
+            var configPostLogoutUris = configuration.GetSection("IdentityServer:ReactClient:PostLogoutRedirectUris")
+                .Get<string[]>();
+            if (configPostLogoutUris != null && configPostLogoutUris.Length > 0)
+            {
+                defaultPostLogoutUris.AddRange(configPostLogoutUris);
+            }
+
+            // Read from IdentityServer:ReactClient:AllowedCorsOrigins array
+            var configCorsOrigins = configuration.GetSection("IdentityServer:ReactClient:AllowedCorsOrigins")
+                .Get<string[]>();
+            if (configCorsOrigins != null && configCorsOrigins.Length > 0)
+            {
+                defaultCorsOrigins.AddRange(configCorsOrigins);
+            }
+
+            // Support for single port configuration (for Aspire dynamic ports)
+            var dynamicPort = configuration["IdentityServer:ReactClient:Port"];
+            if (!string.IsNullOrEmpty(dynamicPort))
+            {
+                var baseUrl = $"http://localhost:{dynamicPort}";
+                defaultRedirectUris.Add($"{baseUrl}/callback");
+                defaultPostLogoutUris.Add($"{baseUrl}/");
+                defaultCorsOrigins.Add(baseUrl);
+            }
         }
 
-    ];
+        // Remove duplicates
+        defaultRedirectUris = defaultRedirectUris.Distinct().ToList();
+        defaultPostLogoutUris = defaultPostLogoutUris.Distinct().ToList();
+        defaultCorsOrigins = defaultCorsOrigins.Distinct().ToList();
+
+        // Log configuration for debugging (only in development)
+        #if DEBUG
+        System.Diagnostics.Debug.WriteLine($"[IdentityServer Config] React Client RedirectUris: {string.Join(", ", defaultRedirectUris)}");
+        System.Diagnostics.Debug.WriteLine($"[IdentityServer Config] React Client CORS Origins: {string.Join(", ", defaultCorsOrigins)}");
+        #endif
+
+        return new Client
+        {
+            ClientId = "react-client",
+            // No client secret for public client (browser-based)
+            RequireClientSecret = false,
+            AllowedGrantTypes = GrantTypes.Code,
+            RedirectUris = defaultRedirectUris,
+            PostLogoutRedirectUris = defaultPostLogoutUris,
+            AllowOfflineAccess = true,
+            AllowedScopes = { "openid", "profile", "email", "roles", "api1", "web" },
+            AllowedCorsOrigins = defaultCorsOrigins,
+            RequirePkce = true,                    // Enforce PKCE for security
+            AllowPlainTextPkce = false,           // Require S256 code challenge
+            AccessTokenLifetime = 3600,           // 1 hour
+            IdentityTokenLifetime = 300           // 5 minutes
+        };
+    }
+
+    /// <summary>
+    /// Legacy method for backward compatibility
+    /// </summary>
+    public static IEnumerable<Client> Clients => GetClients(null);
 }

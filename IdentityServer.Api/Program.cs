@@ -30,7 +30,8 @@ public class Program
         })
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
-            options.Authority = "https://localhost:5001";
+            // IdentityServer.UI runs on https://localhost:7070
+            options.Authority = builder.Configuration["IdentityServer:IssuerUri"] ?? "https://localhost:7070";
             options.Audience = "api1";
             options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters

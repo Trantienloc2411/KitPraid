@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using IdentityServer.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using Duende.IdentityServer.Services;
+using IdentityServer.Application.Services;
+using IdentityServer.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,40 +9,85 @@ namespace IdentityServer.UI.Pages.Account
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IAccountService _accountService;
+        private readonly IIdentityServerInteractionService _interaction;
+        private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager)
+        public LoginModel(
+            IAccountService accountService,
+            IIdentityServerInteractionService interaction,
+            ILogger<LoginModel> logger)
         {
-            _signInManager = signInManager;
+            _accountService = accountService;
+            _interaction = interaction;
+            _logger = logger;
         }
 
         [BindProperty]
-        public LoginInputModel Input { get; set; }
+        public LoginInputModel Input { get; set; } = new();
 
         public string ReturnUrl { get; set; }
 
-        public void OnGet(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
-            ReturnUrl = returnUrl ?? Url.Content("~/");
+            ReturnUrl = returnUrl;
+
+            // Check if we have a valid authorization context from IdentityServer
+            var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+            if (context != null)
+            {
+                // This is an IdentityServer authorization request
+                ReturnUrl = returnUrl;
+                return Page();
+            }
+
+            // If no context, just show the login page
+            if (string.IsNullOrEmpty(ReturnUrl))
+            {
+                ReturnUrl = Url.Content("~/");
+            }
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid) return Page();
 
-            var result = await _signInManager.PasswordSignInAsync(
+            // Check if this is an IdentityServer authorization request
+            var context = await _interaction.GetAuthorizationContextAsync(ReturnUrl);
+
+            // Use AccountService to sign in the user
+            var result = await _accountService.SignInAsync(
                 Input.Email,
                 Input.Password,
                 isPersistent: false,
                 lockoutOnFailure: false
             );
 
-            if (result.Succeeded)
+            if (result.Success)
             {
-                return LocalRedirect(ReturnUrl);
+                var userResult = await _accountService.GetUserByEmailAsync(Input.Email);
+                if (userResult.Success && userResult.Data != null)
+                {
+                    _logger.LogInformation("User {Email} logged in successfully", Input.Email);
+
+                    // If this is an IdentityServer authorization request, 
+                    // redirect back to authorization endpoint
+                    // IdentityServer middleware will detect authenticated user and continue flow
+                    if (context != null)
+                    {
+                        // Redirect back to /connect/authorize with the same parameters
+                        // IdentityServer will detect the authenticated user cookie and issue authorization code
+                        return Redirect(ReturnUrl);
+                    }
+                }
+
+                // For non-IdentityServer requests, redirect to return URL or home
+                return LocalRedirect(ReturnUrl ?? Url.Content("~/"));
             }
 
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            ModelState.AddModelError(string.Empty, result.Error ?? "Invalid login attempt.");
             return Page();
         }
     }
@@ -50,10 +96,12 @@ namespace IdentityServer.UI.Pages.Account
     {
         [Required]
         [EmailAddress]
+        [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
+        [Display(Name = "Password")]
         public string Password { get; set; }
     }
 }
