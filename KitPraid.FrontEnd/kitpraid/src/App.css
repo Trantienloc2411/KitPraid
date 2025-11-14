@@ -1,5 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
+/* CSS Reset - Remove default whitespace */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 /* Global font and text improvements */
 * {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
@@ -11,6 +25,49 @@ body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove default spacing from common elements */
+h1, h2, h3, h4, h5, h6, p, ul, ol, li, dl, dt, dd, blockquote, pre, figure, hr {
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove list styles */
+ul, ol {
+  list-style: none;
+}
+
+/* Remove default link styles */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Remove default button styles */
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Remove default input styles */
+input, textarea, select {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+}
+
+/* Remove default image spacing */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 /* Responsive text utilities - Smaller, more balanced sizes */
@@ -91,6 +148,18 @@ p, .text-body {
   margin-top: 0;
   font-family: 'Inter', sans-serif;
 }
+.navigation-header-item-socials a {
+  text-decoration: none;
+  color: white  ;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+}
+.navigation-header-item-socials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Link component hover styles - opacity handled in component */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

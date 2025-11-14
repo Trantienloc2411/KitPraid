@@ -10,5 +10,6 @@ public interface IProductRepository
     Task<Product> SaveAsync(Product product);
     Task<bool> DeleteAsync(string id);
     Task<PageResult<Product>> GetAllProductsWithKeywordAsync(PageRequest pageRequest, string keyword);
+    Task<Product?> AddProductAsync(Product product);
     
 }

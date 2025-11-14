@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ProductService.Api.Exceptions;
 using ProductService.Infrastructure.Data;
 
 namespace ProductService.Api;
@@ -26,6 +27,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseMiddleware<GlobalExceptionHandler>();
 
         app.UseAuthorization();
 
