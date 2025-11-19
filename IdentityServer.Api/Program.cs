@@ -30,7 +30,10 @@ public class Program
         })
         .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
-            options.Authority = "https://localhost:5001";
+            // IdentityServer.UI runs on https://localhost:7070
+            // Authority used to validate tokens - ensure this matches the issuer (iss) in issued tokens
+            // Default changed to https://localhost:5001 because tokens show issuer https://localhost:5001
+            options.Authority = builder.Configuration["IdentityServer:IssuerUri"] ?? "https://localhost:5001";
             options.Audience = "api1";
             options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -50,7 +53,10 @@ public class Program
                 {
                     var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("JwtBearer");
                     var sub = context.Principal?.FindFirst("sub")?.Value ?? context.Principal?.Identity?.Name;
-                    logger.LogInformation("JWT token validated for subject: {Sub}", sub);
+                    var iss = context.Principal?.FindFirst("iss")?.Value;
+                    var aud = string.Join(',', context.Principal?.FindAll("aud")?.Select(c => c.Value) ?? Array.Empty<string>());
+                    var scopes = context.Principal?.FindFirst("scope")?.Value;
+                    logger.LogInformation("JWT token validated for subject: {Sub} (iss: {Iss}, aud: {Aud}, scope: {Scope})", sub, iss, aud, scopes);
                     return Task.CompletedTask;
                 },
                 OnChallenge = context =>
@@ -148,6 +154,7 @@ public class Program
         })
         .AddDeveloperSigningCredential()
         .AddInMemoryIdentityResources(Config.IdentityResources)
+        .AddInMemoryApiResources(Config.ApiResources)
         .AddInMemoryApiScopes(Config.ApiScopes)
         .AddInMemoryClients(Config.Clients)
         .AddAspNetIdentity<ApplicationUser>()
@@ -179,6 +186,35 @@ public class Program
         app.UseRouting();
 
         app.UseCors("AllowFrontEnd");
+
+        // Diagnostic middleware: logs Authorization header and authentication state
+        app.Use(async (context, next) =>
+        {
+            var logger = context.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("AuthDebug");
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            var shortAuth = string.IsNullOrEmpty(authHeader)
+                ? "none"
+                : (authHeader.Length > 80 ? authHeader.Substring(0, 80) + "..." : authHeader);
+
+            logger.LogInformation("Incoming request {Method} {Path} Authorization: {AuthHeader}",
+                context.Request.Method, context.Request.Path, shortAuth);
+
+            try
+            {
+                await next();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unhandled exception processing request");
+                throw;
+            }
+            finally
+            {
+                var isAuth = context.User?.Identity?.IsAuthenticated ?? false;
+                var name = context.User?.Identity?.Name ?? context.User?.FindFirst("sub")?.Value ?? "unknown";
+                logger.LogInformation("Request completed. IsAuthenticated: {IsAuth}, User: {UserName}", isAuth, name);
+            }
+        });
 
         app.UseIdentityServer();
 

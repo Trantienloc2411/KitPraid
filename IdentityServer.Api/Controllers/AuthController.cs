@@ -144,7 +144,7 @@ public class AuthController : ControllerBase
     // Diagnostic helper: lookup by email to confirm repository returns user data
     // This is AllowAnonymous for quick testing; remove or protect in production
     [HttpGet("user/by-email")]
-    [AllowAnonymous]
+    [Authorize]
     public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
     {
         _logger?.LogInformation("GetUserByEmail called for {Email}", email);

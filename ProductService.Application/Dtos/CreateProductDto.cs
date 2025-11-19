@@ -4,7 +4,7 @@ using ProductService.Domain.Entities;
 
 namespace ProductService.Application.Dtos;
 
-public class CreateProductDtos
+public class CreateProductDto
 {
     [Required(ErrorMessage = "Name is required")]
     [MinLength(5, ErrorMessage = "At least 5 chars"), MaxLength(120, ErrorMessage = "At most 120 chars")]
@@ -20,6 +20,8 @@ public class CreateProductDtos
     public Guid BrandId { get; set; }
     [Required(ErrorMessage = "Sku is required")]
     public string Sku { get; set; } =  string.Empty;
+    [Length(0, 999,  ErrorMessage = "Length must be between 0 and 999")]
+    public int Stock { get; set; }
     [Required(ErrorMessage = "Attributes is required")]
     public Dictionary<string, object>? Attributes { get; set; }
     [DefaultValue(false)]
@@ -27,6 +29,9 @@ public class CreateProductDtos
     public bool IsDeleted { get; set; } = false;
     public ICollection<Image>? Images { get; set; }
     public Guid UserId { get; set; }
+    
+    public string? CategoryId { get; set; }
+    
     
     public DateTime Created { get; set; } = DateTime.Now;
     public DateTime Modified { get; set; } = DateTime.Now;

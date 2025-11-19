@@ -1,4 +1,5 @@
-﻿using ProductService.Domain.Entities;
+﻿using ProductService.Domain;
+using ProductService.Domain.Entities;
 using ProductService.Domain.Repositories;
 using ProductService.Infrastructure.Data;
 
@@ -8,35 +9,31 @@ public class ImageRepository(ProductDbContext productDbContext) : IImageReposito
 {
     private readonly ProductDbContext _dbContext;
 
-    public async Task<bool> DeleteImageAsync(Guid imageId)
+    public async Task<OperationResult<bool>> DeleteImageAsync(Guid imageId)
     {
         var image = await _dbContext.Images.FindAsync(imageId);
         if (image == null)
         {
-            return false;
+            return OperationResult<bool>.Fail("Image not found.");
         }
         else
         {
             image.IsDeleted = true;
             await _dbContext.SaveChangesAsync();
-            return true;
+            return OperationResult<bool>.Ok(true);
         }
     }
 
-    public async Task<Image> GetImageAsync(Guid imageId)
+    public async Task<OperationResult<Image>> GetImageAsync(Guid imageId)
     {
-        var image = await _dbContext.Images.FindAsync(imageId) ?? throw new InvalidOperationException($"Image with ID {imageId} not found.");
-        return image;
+        var image = await _dbContext.Images.FindAsync(imageId);
+        return image == null ? OperationResult<Image>.Fail("Image not found.") : OperationResult<Image>.Ok(image);
     }
 
-    public async Task<Image> UpdateImageAsync(Image image)
+    public async Task<OperationResult<Image>> UpdateImageAsync(Image image)
     {
-        var existingImage = await _dbContext.Images.FindAsync(image.Id) ?? throw new InvalidOperationException($"Image with ID {image.Id} not found.");
-        existingImage.ImagePath = image.ImagePath;
-        existingImage.ProductId = image.ProductId;
-        existingImage.IsDeleted = image.IsDeleted;
-
+        var result = _dbContext.Images.Update(image);
         await _dbContext.SaveChangesAsync();
-        return existingImage;
+        return OperationResult<Image>.Ok(image);
     }
 }
