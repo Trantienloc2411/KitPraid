@@ -17,6 +17,8 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
             .Skip(pageRequest.Skip)
             .Take(pageRequest.Size)
             .Include(b => b.Brand)
+            .Include(i => i.Images)
+            .OrderByDescending(p => p.Created)
             .ToListAsync();
 
         var page = new PageResult<Product>(products, totalCount, pageRequest.Page, pageRequest.Size);
@@ -75,7 +77,11 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
             var productsQuery = await context.Products
                 .Where(p => p.IsDeleted == false || p.IsActive == false &&
                     (EF.Functions.Contains(p.ProductName, keyword) ||
-                     EF.Functions.Contains(p.ProductDescription, keyword)))
+                     EF.Functions.Contains(p.ProductDescription, keyword) ||
+                     EF.Functions.Contains(p.Sku, keyword)
+                     ))
+                .Include(b => b.Brand)
+                .Include(i => i.Images)
                 .ToListAsync();
 
 

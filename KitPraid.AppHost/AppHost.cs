@@ -10,6 +10,10 @@ var gateway = builder.AddProject<Projects.KitPraid_Gateway>("gateway")
     .WithHttpsEndpoint(port: 7215, name: "gateway-https")
     .WithReference(identityServer)
     .WaitFor(identityServer);
+var productApi = builder.AddProject<Projects
+        .ProductService_Api>("product-api")
+    .WithHttpsEndpoint(port: 6162, name: "product-api-https")
+    .WaitFor(identityServer);
     
 builder.Services.AddLogging(logging => logging.AddConsole());
 

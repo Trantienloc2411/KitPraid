@@ -3,9 +3,9 @@
 public class PageResult<T>
 {
     public IEnumerable<T> Items { get; set; }
-    private int TotalCount { get; set; }
-    private int Page {get;set;}
-    private int Size {get;set;}
+    public int TotalCount { get; set; }
+    public int Page {get;set;}
+    public int Size {get;set;}
     private int TotalPages => (int)Math.Ceiling(TotalCount / (double)Size);
     
     public bool HasNextPage => Page < TotalPages;
@@ -18,6 +18,5 @@ public class PageResult<T>
         Page = page;
         Size = size;
     }
-    
     
 }

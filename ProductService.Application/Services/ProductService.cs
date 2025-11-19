@@ -1,11 +1,11 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Application.Dtos;
+using ProductService.Application.Mapping;
 using ProductService.Domain;
 using ProductService.Domain.Entities;
 using ProductService.Domain.Repositories;
 using ProductService.Domain.ValueObjects;
-using ProductService.Infrastructure.Mapping;
 
 namespace ProductService.Application.Services;
 
@@ -50,21 +50,58 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         }
     }
 
-    public async Task<OperationResult<PageResult<Product>>> GetAllProductsAsync(PageRequest pageRequest)
+    public async Task<OperationResult<PageResult<GetProductDto>>> GetProductsByKeywordAsync(PageRequest pageRequest, string keyword)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<OperationResult<PageResult<GetProductDto>>> GetAllProductsAsync(PageRequest pageRequest)
     {
         try
         {
-            return await productRepository.GetAllAsync(pageRequest);
+           
+            var result = await productRepository.GetAllAsync(pageRequest);
+            var mappedItems = result.Data.Items
+                .Select(ProductMapper.ToGetProductDto)
+                .ToList();
+            var pageResult = new PageResult<GetProductDto>(
+                mappedItems,
+                result.Data.TotalCount,
+                pageRequest.Page,
+                pageRequest.Size
+            );
+            return OperationResult<PageResult<GetProductDto>>.Ok(pageResult);
         }
         catch (Exception e)
         {
-            return OperationResult<PageResult<Product>>.Fail($"Some unexpected error. Details : {e.Message}");
+            return OperationResult<PageResult<GetProductDto>>.Fail(
+                $"Some unexpected error. Details: {e.Message}"
+            );
         }
     }
 
-    public Task<OperationResult<Product>> GetProductByIdAsync(string id)
+
+    public async Task<OperationResult<GetProductDetailDto>> GetProductByIdAsync(string id)
     {
-        return productRepository.GetByIdAsync(id);
+        /*var result = await productRepository.GetByIdAsync(id);
+        if (result.Success)
+        {
+            if (result.Data != null)
+            {
+                var mapped = BrandMapper.ToGetProductDetailDto(result.Data);
+                return OperationResult<GetProductDetailDto>.Ok(mapped);
+            }
+            else
+            {
+                return OperationResult<GetProductDetailDto>.Fail("Product not found");
+            }
+        }
+        else
+        {
+            return OperationResult<GetProductDetailDto>.Fail(result.Error ?? "Unknown error");
+        }*/
+        //TO-DO: Implement this method
+        throw new NotImplementedException();    
     }
 
     public async Task<OperationResult<Product>> UpdateProductAsync(string id, UpdateProductDto product)

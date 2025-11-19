@@ -12,7 +12,7 @@ using System.Security.Claims;
 namespace IdentityServer.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [Authorize]
 public class AuthController : ControllerBase
 {

@@ -6,9 +6,13 @@ using IdentityServer.Infrastructure.Configuration;
 using IdentityServer.Infrastructure.Data;
 using IdentityServer.Infrastructure.Repositories;
 using IdentityServer.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DbContext = IdentityServer.Infrastructure.Data.DbContext;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +68,31 @@ var identityServerBuilder = builder.Services.AddIdentityServer(options =>
     .AddInMemoryClients(Config.GetClients(builder.Configuration)) // Pass configuration for dynamic ports
     .AddAspNetIdentity<ApplicationUser>()
     .AddProfileService<CustomProfileService>();
+
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        //options.Authority = builder.Configuration["IdentityServer:IssuerUri"] ?? "https://localhost:7070";
+        options.Authority = "https://localhost:5001";
+        options.Audience = "api1";
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidIssuers = new[] { "https://localhost:7070", "https://localhost:5001", "https://localhost:5002" }
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.DefaultPolicy = new AuthorizationPolicyBuilder(
+            JwtBearerDefaults.AuthenticationScheme)
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 // In Development, use custom validator that allows any localhost port
 // This is helpful when using Aspire with dynamic port assignment
@@ -129,6 +158,8 @@ builder.Services.AddCors(options =>
         }
     });
 });
+
+
 
 var app = builder.Build();
 

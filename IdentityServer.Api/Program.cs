@@ -79,7 +79,7 @@ public class Program
         builder.Logging.AddConsole();
         builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
-
+        
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
@@ -218,10 +218,10 @@ public class Program
 
         app.UseIdentityServer();
 
-        app.UseAuthentication();
 
         app.UseAuthorization();
 
+        app.UseAuthentication();
         app.MapControllers();
 
         // Configure the HTTP request pipeline.
