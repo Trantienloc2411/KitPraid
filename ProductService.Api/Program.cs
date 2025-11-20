@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Api.Exceptions;
 using ProductService.Application.Services;
@@ -17,7 +18,10 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+        });
         builder.Services.AddAuthentication("Bearer").
             AddJwtBearer(options =>
                 {
@@ -54,7 +58,18 @@ public class Program
 
         builder.Services.AddScoped<IProductService, Application.Services.ProductService>();
         builder.Services.AddScoped<IBrandService, BrandService>();
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+        
+        /*
+        builder.Services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new ObjectDictionaryConverter());
+        });*/
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

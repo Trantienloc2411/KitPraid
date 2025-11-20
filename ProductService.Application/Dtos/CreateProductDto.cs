@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using ProductService.Domain.Entities;
 
 namespace ProductService.Application.Dtos;
@@ -20,20 +21,23 @@ public class CreateProductDto
     public Guid BrandId { get; set; }
     [Required(ErrorMessage = "Sku is required")]
     public string Sku { get; set; } =  string.Empty;
-    [Length(0, 999,  ErrorMessage = "Length must be between 0 and 999")]
+    [Range(0, 999,  ErrorMessage = "Range must be between 0 and 999")]
     public int Stock { get; set; }
     [Required(ErrorMessage = "Attributes is required")]
     public Dictionary<string, object>? Attributes { get; set; }
     [DefaultValue(false)]
     public bool IsActive { get; set; }
     public bool IsDeleted { get; set; } = false;
-    public ICollection<Image>? Images { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<Image>? Images { get; set; }
+    [JsonIgnore]
     public Guid UserId { get; set; }
     
     public string? CategoryId { get; set; }
     
-    
+    [JsonIgnore]
     public DateTime Created { get; set; } = DateTime.Now;
+    [JsonIgnore]
     public DateTime Modified { get; set; } = DateTime.Now;
     
 }

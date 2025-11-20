@@ -1,4 +1,5 @@
 using System;
+using Meilisearch;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Application.Dtos;
 using ProductService.Application.Mapping;
@@ -52,7 +53,43 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 
     public async Task<OperationResult<PageResult<GetProductDto>>> GetProductsByKeywordAsync(PageRequest pageRequest, string keyword)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var result = await productRepository.GetAllProductsWithKeywordAsync(pageRequest, keyword);
+            if (result.Success)
+            {
+                var mappedItems = result.Data.Items
+                    .Select(ProductMapper.ToGetProductDto)
+                    .ToList();
+                var pageResult = new PageResult<GetProductDto>(
+                    mappedItems,
+                    result.Data.TotalCount,
+                    pageRequest.Page,
+                    pageRequest.Size
+                );
+                return OperationResult<PageResult<GetProductDto>>.Ok(pageResult);
+            }
+            else
+            {
+                return OperationResult<PageResult<GetProductDto>>.Fail(result.Error ?? "Unknown error");
+            }
+            
+            
+            /*var client = new MeilisearchClient("http://localhost:7700", "ttloc2411");
+            
+            var index = await client.Index("products")
+                .UpdateSettingsAsync(
+                    new Settings
+                    {
+                        SearchableAttributes = new[] { "ProductName", "ProductDescription", "Sku" },
+                        FilterableAttributes = new[] { "Price" },
+                        SortableAttributes = new [] {"Price"}
+                    });*/
+        }
+        catch (DbUpdateException e)
+        {
+            return OperationResult<PageResult<GetProductDto>>.Fail(e.Message);
+        }
     }
 
     public async Task<OperationResult<PageResult<GetProductDto>>> GetAllProductsAsync(PageRequest pageRequest)
@@ -83,12 +120,12 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 
     public async Task<OperationResult<GetProductDetailDto>> GetProductByIdAsync(string id)
     {
-        /*var result = await productRepository.GetByIdAsync(id);
+        var result = await productRepository.GetByIdAsync(id);
         if (result.Success)
         {
             if (result.Data != null)
             {
-                var mapped = BrandMapper.ToGetProductDetailDto(result.Data);
+                var mapped = ProductMapper.ToGetProductDetailDto(result.Data);
                 return OperationResult<GetProductDetailDto>.Ok(mapped);
             }
             else
@@ -99,9 +136,8 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         else
         {
             return OperationResult<GetProductDetailDto>.Fail(result.Error ?? "Unknown error");
-        }*/
-        //TO-DO: Implement this method
-        throw new NotImplementedException();    
+        }
+       
     }
 
     public async Task<OperationResult<Product>> UpdateProductAsync(string id, UpdateProductDto product)

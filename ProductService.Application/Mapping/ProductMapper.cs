@@ -10,13 +10,13 @@ public static class ProductMapper
     {
         return new Product
         {
-            Id = Guid.NewGuid(), // or let DB generate
+            Id = Guid.NewGuid(), 
             ProductName = dto.ProductName,
             ProductDescription = dto.ProductDescription,
             Price = dto.Price,
             Sku = dto.Sku,
             BrandId = dto.BrandId,
-            CategoryId = dto.CategoryId,   // IMPORTANT if category is required
+            CategoryId = dto.CategoryId,   
             Stock = dto.Stock,
             IsActive = dto.IsActive,
             IsDeleted = false,

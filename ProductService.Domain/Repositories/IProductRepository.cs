@@ -13,4 +13,6 @@ public interface IProductRepository
     Task<OperationResult<Product>> AddProductAsync(Product product);
     Task<OperationResult<Product>> UpdateAsync(Product product);
     
+    
+    
 }

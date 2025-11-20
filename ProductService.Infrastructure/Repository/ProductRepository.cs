@@ -71,30 +71,29 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
         
     }
 
-    public async Task<OperationResult<PageResult<Product>>> GetAllProductsWithKeywordAsync(PageRequest pageRequest, string keyword)
+    public async Task<OperationResult<PageResult<Product>>> GetAllProductsWithKeywordAsync(
+        PageRequest pageRequest, string keyword)
     {
+        var productsQuery = context.Products
+            .Where(p => p.IsDeleted == false && p.IsActive == true &&
+                        (p.ProductName.Contains(keyword) ||
+                         p.ProductDescription.Contains(keyword) ||
+                         p.Sku.Contains(keyword)))
+            .Include(p => p.Brand)
+            .Include(p => p.Images);
 
-            var productsQuery = await context.Products
-                .Where(p => p.IsDeleted == false || p.IsActive == false &&
-                    (EF.Functions.Contains(p.ProductName, keyword) ||
-                     EF.Functions.Contains(p.ProductDescription, keyword) ||
-                     EF.Functions.Contains(p.Sku, keyword)
-                     ))
-                .Include(b => b.Brand)
-                .Include(i => i.Images)
-                .ToListAsync();
+        var totalCount = await productsQuery.CountAsync();
 
+        var products = await productsQuery
+            .Skip(pageRequest.Skip)
+            .Take(pageRequest.Size)
+            .ToListAsync();
 
-            var totalCount = productsQuery.Count;
-            var products = productsQuery
-                .Skip(pageRequest.Skip)
-                .Take(pageRequest.Size)
-                .ToList();
+        var page = new PageResult<Product>(products, totalCount, pageRequest.Page, pageRequest.Size);
 
-            var page = new PageResult<Product>(products, totalCount, pageRequest.Page, pageRequest.Size);
-            return OperationResult<PageResult<Product>>.Ok(page);
-
+        return OperationResult<PageResult<Product>>.Ok(page);
     }
+
 
     public async Task<OperationResult<Product>> AddProductAsync(Product product)
     {
