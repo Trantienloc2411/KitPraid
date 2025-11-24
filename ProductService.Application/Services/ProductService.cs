@@ -16,6 +16,10 @@ public class ProductService(IProductRepository productRepository) : IProductServ
     {
         try
         {
+            var productExist = await productRepository.GetProductBySkuAsync(product.Sku);
+            if (productExist.Success) return OperationResult<Product>.Fail("Product already exist");
+            if (productExist.Error != null) return OperationResult<Product>.Fail(productExist.Error);
+            
             var mapping = ProductMapper.ToCreateProduct(product);
             var result = await productRepository.AddProductAsync(mapping);
             return result;

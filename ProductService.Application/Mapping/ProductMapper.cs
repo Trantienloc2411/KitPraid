@@ -73,7 +73,7 @@ public static class ProductMapper
             Attributes = product.Attributes,
             BrandName = product.Brand?.BrandName,
             CategoryId = product.CategoryId,
-            Images = product.Images.ToList()
+            Images = product.Images?.ToList()
         };
     }
     

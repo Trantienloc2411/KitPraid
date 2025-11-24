@@ -38,7 +38,8 @@ public class Program
             options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
-                RoleClaimType = "role"
+                RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+                NameClaimType = "sub"
             };
             // Add diagnostic event handlers to log authentication lifecycle events
             options.Events = new JwtBearerEvents

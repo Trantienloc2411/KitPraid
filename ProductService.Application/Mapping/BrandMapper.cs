@@ -40,4 +40,15 @@ public static class BrandMapper
             BrandImageUrl = brand.BrandImage
         };
     }
+
+    public static GetBrandItemsDto ToGetBrandItemDto(Brand brand)
+    {
+
+        return new GetBrandItemsDto
+        {
+            BrandId = brand.Id,
+            BrandName = brand.BrandName,
+            Products = brand.Products.Select(p => ProductMapper.ToGetProductDto(p)).ToList()
+        };
+    }
 }

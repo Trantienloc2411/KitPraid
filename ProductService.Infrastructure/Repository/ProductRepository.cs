@@ -14,6 +14,7 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
         var totalCount = await context.Products.CountAsync();
 
         var products = await context.Products
+            .Where(c => c.IsDeleted == false && c.IsActive == true)
             .Skip(pageRequest.Skip)
             .Take(pageRequest.Size)
             .Include(b => b.Brand)
@@ -119,5 +120,11 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
         var result = context.Products.Update(product);
         var saveResult = await context.SaveChangesAsync();
         return OperationResult<Product>.Ok(product);
+    }
+
+    public async Task<OperationResult<Product>> GetProductBySkuAsync(string sku)
+    {
+        var result = await context.Products.FirstOrDefaultAsync(p => p.Sku.Trim().ToUpper() == sku.Trim().ToUpper());
+        return result is null ? OperationResult<Product>.Fail("Product not found.") : OperationResult<Product>.Ok(result);
     }
 }

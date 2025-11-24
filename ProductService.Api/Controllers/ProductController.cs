@@ -48,6 +48,21 @@ public class ProductController(IProductService productService, ILogger<ProductCo
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<OperationResult<Product>>> Update(string id, [FromBody] UpdateProductDto product)
+    {
+        var result = await productService.UpdateProductAsync(id, product);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<OperationResult<bool>>> Delete(string id)
+    {
+        var result = await productService.DeleteProductAsync(id);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
 
     
 }

@@ -15,7 +15,7 @@ Tạo file `.env` trong root directory:
 VITE_API_BASE_URL=http://localhost:3000/api
 
 # Auth API (có thể khác hoặc giống default)
-VITE_AUTH_API_URL=http://localhost:3001/api/auth
+VITE_AUTH_API_URL=http://localhost:3001/auth
 # Nếu không set, sẽ dùng VITE_API_BASE_URL
 
 # Payment API
@@ -35,32 +35,32 @@ Services đã được cấu hình sẵn để sử dụng base URL phù hợp:
 
 ```jsx
 // auth.js - Tự động dùng auth base URL
-import { getApiClient } from './api';
-const api = getApiClient('auth'); // Uses VITE_AUTH_API_URL
+import { getApiClient } from "./api";
+const api = getApiClient("auth"); // Uses VITE_AUTH_API_URL
 
 // payment.js - Tự động dùng payment base URL
-import { getApiClient } from './api';
-const api = getApiClient('payment'); // Uses VITE_PAYMENT_API_URL
+import { getApiClient } from "./api";
+const api = getApiClient("payment"); // Uses VITE_PAYMENT_API_URL
 
 // products.js - Dùng default base URL
-import api from './api'; // Uses VITE_API_BASE_URL
+import api from "./api"; // Uses VITE_API_BASE_URL
 ```
 
 **Option 2: Tạo service với base URL tùy chỉnh**
 
 ```jsx
 // src/services/custom.js
-import { createApi } from './api';
+import { createApi } from "./api";
 
 // Tạo API client với base URL tùy chỉnh
-const customApi = createApi('custom'); // Sẽ tìm VITE_CUSTOM_API_URL
+const customApi = createApi("custom"); // Sẽ tìm VITE_CUSTOM_API_URL
 
 // Hoặc tạo với URL trực tiếp
-const directApi = createApi('https://custom-api.example.com');
+const directApi = createApi("https://custom-api.example.com");
 
 export const customService = {
   getData: async () => {
-    const response = await customApi.get('/data');
+    const response = await customApi.get("/data");
     return response.data;
   },
 };
@@ -72,18 +72,18 @@ export const customService = {
 
 ```jsx
 // products.js và cart.js đều dùng default API
-import api from './api'; // Cùng base URL
+import api from "./api"; // Cùng base URL
 
 export const productsService = {
   getProducts: async () => {
-    const response = await api.get('/products');
+    const response = await api.get("/products");
     return response.data;
   },
 };
 
 export const cartService = {
   getCart: async () => {
-    const response = await api.get('/cart');
+    const response = await api.get("/cart");
     return response.data;
   },
 };
@@ -93,12 +93,12 @@ export const cartService = {
 
 ```jsx
 // auth.js dùng auth-specific base URL
-import { getApiClient } from './api';
-const api = getApiClient('auth'); // URL khác với default
+import { getApiClient } from "./api";
+const api = getApiClient("auth"); // URL khác với default
 
 export const authService = {
   login: async (credentials) => {
-    const response = await api.post('/login', credentials);
+    const response = await api.post("/login", credentials);
     return response.data;
   },
 };
@@ -108,17 +108,17 @@ export const authService = {
 
 ```jsx
 // src/services/analytics.js
-import { createApi } from './api';
+import { createApi } from "./api";
 
 // Option 1: Dùng service mapping (thêm vào api.js)
-const api = createApi('analytics'); // Tìm VITE_ANALYTICS_API_URL
+const api = createApi("analytics"); // Tìm VITE_ANALYTICS_API_URL
 
 // Option 2: Dùng URL trực tiếp
-const api = createApi('https://analytics.example.com/api');
+const api = createApi("https://analytics.example.com/api");
 
 export const analyticsService = {
   trackEvent: async (eventData) => {
-    const response = await api.post('/events', eventData);
+    const response = await api.post("/events", eventData);
     return response.data;
   },
 };
@@ -128,20 +128,20 @@ export const analyticsService = {
 
 ```jsx
 // src/services/flexible.js
-import { getApiClient, createApi } from './api';
+import { getApiClient, createApi } from "./api";
 
 export const flexibleService = {
   // Dùng default API
   getDefaultData: async () => {
-    const defaultApi = getApiClient('default');
-    const response = await defaultApi.get('/data');
+    const defaultApi = getApiClient("default");
+    const response = await defaultApi.get("/data");
     return response.data;
   },
 
   // Dùng custom API
   getCustomData: async (customUrl) => {
     const customApi = createApi(customUrl);
-    const response = await customApi.get('/data');
+    const response = await customApi.get("/data");
     return response.data;
   },
 };
@@ -155,9 +155,15 @@ Mở `src/services/api.js` và thêm vào `API_BASE_URLS`:
 
 ```jsx
 const API_BASE_URLS = {
-  default: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
-  auth: import.meta.env.VITE_AUTH_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
-  analytics: import.meta.env.VITE_ANALYTICS_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  default: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
+  auth:
+    import.meta.env.VITE_AUTH_API_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    "http://localhost:3000/api",
+  analytics:
+    import.meta.env.VITE_ANALYTICS_API_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    "http://localhost:3000/api",
   // Thêm mới ở đây
 };
 ```
@@ -166,24 +172,24 @@ Thêm vào service mapping trong `getApiClient`:
 
 ```jsx
 const serviceMap = {
-  auth: 'auth',
-  payment: 'payment',
-  analytics: 'analytics', // Thêm mới
+  auth: "auth",
+  payment: "payment",
+  analytics: "analytics", // Thêm mới
 };
 ```
 
 ### Cách 2: Dùng trực tiếp URL
 
 ```jsx
-import { createApi } from './api';
+import { createApi } from "./api";
 
 // Tạo API client với URL trực tiếp
-const api = createApi('https://new-api.example.com/api');
+const api = createApi("https://new-api.example.com/api");
 ```
 
 ## Best Practices
 
-1. **Naming Convention**: 
+1. **Naming Convention**:
    - Environment variables: `VITE_<SERVICE>_API_URL`
    - Service names: lowercase (auth, payment, storage)
 
@@ -233,4 +239,3 @@ function Dashboard() {
   return <div>...</div>;
 }
 ```
-

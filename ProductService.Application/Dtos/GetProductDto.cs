@@ -22,7 +22,7 @@ public class GetProductDto
     
     public double Price { get; set; }
     public string? CategoryId { get; set; }
-    public List<Image>? Images { get; set; }
+    public List<Image>? Images { get; set; } = null;
     public string? BrandName { get; set; } = string.Empty;
     
 }

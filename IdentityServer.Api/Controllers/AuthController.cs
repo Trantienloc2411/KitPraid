@@ -32,29 +32,6 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Register(CreateUserRequest request)
     {
-        /*
-        var user = new ApplicationUser
-        {
-            UserName = request.Email,
-            Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            PhoneNumber = request.PhoneNumber,
-            EmailConfirmed = true,
-            IsActive = true,
-            CreatedAt = DateTime.Now
-        };
-
-        var result = await _userManager.CreateAsync(user, request.Password);
-
-        if (!result.Succeeded)
-            return BadRequest(result.Errors);
-
-        if (!await _roleManager.RoleExistsAsync(request.Role))
-            await _roleManager.CreateAsync(new IdentityRole(request.Role));
-
-        await _userManager.AddToRoleAsync(user, request.Role);
-        */
         var createResult = await _userService.CreateUserAsync(request);
         _logger?.LogInformation("Register called for {Email}", request?.Email);
 
@@ -70,6 +47,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPut("update")]
+    [Authorize]
     public async Task<IActionResult> Update([FromBody] UpdateUserRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
@@ -78,10 +56,6 @@ public class AuthController : ControllerBase
             _logger?.LogWarning("Update called but userId not found in claims");
             return Unauthorized("User id not present in token.");
         }
-
-        // var getOp = await _userService.GetUserAsync(userId);
-        // if (!getOp.Success || getOp.Data is null)
-        //     return NotFound(getOp.Error ?? "User not found.");
 
         _logger?.LogInformation("Update called for userId={UserId}", userId);
 
@@ -98,9 +72,12 @@ public class AuthController : ControllerBase
     }
 
     [HttpPut("change-password")]
+    [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        
+        
         if (string.IsNullOrEmpty(userId))
         {
             _logger?.LogWarning("ChangePassword called but userId not found in claims");
@@ -128,6 +105,9 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetUserById(string userId)
     {
+        var tokenUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        var isAdmin = User.IsInRole("Admin");
+        if (!isAdmin && tokenUserId != userId) return Forbid();
         _logger?.LogInformation("GetUserById called for {UserId}", userId);
         var result = await _userService.GetUserAsync(userId);
         if (!result.Success)

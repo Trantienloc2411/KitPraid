@@ -22,6 +22,20 @@ public class Program
         {
             options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
         });
+        
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("User", policy => policy.RequireRole("User"));
+        });
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Anonymous", policy => policy.RequireAssertion(context => !context.User.Identity.IsAuthenticated));
+        });
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
+        });
+        
         builder.Services.AddAuthentication("Bearer").
             AddJwtBearer(options =>
                 {

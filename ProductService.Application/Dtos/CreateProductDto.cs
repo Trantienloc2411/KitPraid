@@ -11,7 +11,7 @@ public class CreateProductDto
     [MinLength(5, ErrorMessage = "At least 5 chars"), MaxLength(120, ErrorMessage = "At most 120 chars")]
     public string ProductName { get; set; } = string.Empty;
     [Required(ErrorMessage = "Description is required")]
-    [MinLength(20, ErrorMessage = "At least 20 chars"), MaxLength(350,  ErrorMessage = "At most 350 chars")]
+    [MinLength(20, ErrorMessage = "At least 20 chars"), MaxLength(2000,  ErrorMessage = "At most 2000 chars")]
     public string ProductDescription { get; set; } = string.Empty;
     [Required(ErrorMessage = "Price is required")]
     [Range(1, 99999999999)]

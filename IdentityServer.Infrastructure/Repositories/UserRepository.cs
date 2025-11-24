@@ -53,7 +53,7 @@ public class UserRepository : IUserRepository
 
         if (!await _roleManager.RoleExistsAsync(role))
             await _roleManager.CreateAsync(new IdentityRole(role));
-
+        await _userManager.AddToRoleAsync(userParams, role);
         var createdOp = await GetByIdAsync(userParams.Id);
         if (!createdOp.Success || createdOp.Data is null)
             return Domain.OperationResult<ApplicationUser>.Fail("User created but could not be retrieved afterwards.");
