@@ -15,6 +15,7 @@ public class BrandRepository : IBrandRepository
     {
         _dbContext = dbContext;
     }
+
     public async Task<OperationResult<PageResult<Brand>>> GetAllBrandsAsync(PageRequest pageRequest)
     {
         var totalRecords = await _dbContext.Brands.CountAsync();
@@ -29,7 +30,7 @@ public class BrandRepository : IBrandRepository
 
     public async Task<OperationResult<int>> CountAllBrandsAsync()
     {
-        var result =  await _dbContext.Brands.CountAsync();
+        var result = await _dbContext.Brands.CountAsync();
         return OperationResult<int>.Ok(result);
     }
 
@@ -39,6 +40,7 @@ public class BrandRepository : IBrandRepository
         var brands = await _dbContext.Brands
             .Include(b => b.Products)
             .Where(b => b.Id == brandId)
+            .Where(c => c.Products.Any(p => p.IsDeleted == false))
             .Skip((pageRequest.Page - 1) * pageRequest.Size)
             .Take(pageRequest.Size)
             .ToListAsync();
@@ -61,15 +63,25 @@ public class BrandRepository : IBrandRepository
 
     public async Task<OperationResult<Brand>> DeleteBrandAsync(Guid brandId)
     {
-        var brand = await _dbContext.Brands.FindAsync(brandId) ?? throw new InvalidOperationException($"Brand with ID {brandId} not found.");
+        var brand = await _dbContext.Brands.Include(b => b.Products).
+        FirstOrDefaultAsync(c => c.Id == brandId);
+        if (brand == null) return OperationResult<Brand>.Fail("Brand not found.");
+
         brand.IsDeleted = true;
+
+        foreach (var product in brand.Products)
+        {
+            product.IsDeleted = true;
+        }
+
         await _dbContext.SaveChangesAsync();
         return OperationResult<Brand>.Ok(brand);
     }
 
     public async Task<OperationResult<Brand>> UpdateBrandAsync(Brand brand)
     {
-        var existingBrand = await _dbContext.Brands.FindAsync(brand.Id) ?? throw new InvalidOperationException($"Brand with ID {brand.Id} not found.");
+        var existingBrand = await _dbContext.Brands.FindAsync(brand.Id) ??
+                            throw new InvalidOperationException($"Brand with ID {brand.Id} not found.");
         existingBrand.BrandName = brand.BrandName;
         existingBrand.IsDeleted = brand.IsDeleted;
 
@@ -82,5 +94,12 @@ public class BrandRepository : IBrandRepository
         await _dbContext.Brands.AddAsync(brand);
         await _dbContext.SaveChangesAsync();
         return OperationResult<Brand>.Ok(brand);
+    }
+
+    public async Task<OperationResult<Brand>> GetBrandByBrandCodeAsync(string brandCode)
+    {
+        var brand = await _dbContext.Brands.FirstOrDefaultAsync(c =>
+            c.BrandCode.Trim().ToUpper() == brandCode.Trim().ToUpper());
+        return brand is null ? OperationResult<Brand>.Fail("Brand not found.") : OperationResult<Brand>.Ok(brand);
     }
 }

@@ -12,5 +12,8 @@ public interface IProductRepository
     Task<OperationResult<PageResult<Product>>> GetAllProductsWithKeywordAsync(PageRequest pageRequest, string keyword);
     Task<OperationResult<Product>> AddProductAsync(Product product);
     Task<OperationResult<Product>> UpdateAsync(Product product);
+    Task<OperationResult<Product>> GetProductBySkuAsync(string sku);
+    
+    
     
 }

@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MeiliSearch" Version="0.17.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
     </ItemGroup>
 

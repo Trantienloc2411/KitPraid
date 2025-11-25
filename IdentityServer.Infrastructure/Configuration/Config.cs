@@ -22,7 +22,8 @@ public static class Config
         new ApiScope("customers","Customers"),
         new ApiScope("admins", "Admins"),
         new ApiScope("mobile", "Mobile"),
-        new ApiScope("web", "Website")
+        new ApiScope("web", "Website"),
+        new ApiScope("offline_access", "Offline access")
     ];
 
     // Define ApiResources so issued access tokens include the proper 'aud' claim
@@ -44,6 +45,7 @@ public static class Config
             ClientSecrets = { new Secret("secret".Sha256()) },
             AllowedGrantTypes = GrantTypes.ClientCredentials,
             AllowedScopes = { "api1" }
+            
         },
 
         new Client
@@ -58,16 +60,22 @@ public static class Config
             PostLogoutRedirectUris = { "https://localhost:5001/" },
 
             AllowOfflineAccess = true,
-            AllowedScopes = { "api2", "openid", "profile", "roles", "api1" }
+            RefreshTokenUsage = TokenUsage.ReUse,
+            SlidingRefreshTokenLifetime = 1296000,
+            AccessTokenLifetime = 3600,
+            AllowedScopes = { "api2", "openid", "profile", "roles", "api1", "offline_access" }
         },
         new Client
         {
             ClientId = "postman-client",
             ClientSecrets = { new Secret("secret".Sha256()) },
             AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-            AllowedScopes = { "openid", "profile", "email", "roles", "api1" },  // Changed from "read:products" to "api1"
+            AllowedScopes = { "openid", "profile", "email", "roles", "api1", "offline_access" },  // Changed from "read:products" to "api1"
             AllowedCorsOrigins = {"http://localhost:5173"},
             AllowOfflineAccess = true,
+            RefreshTokenUsage = TokenUsage.ReUse,
+            SlidingRefreshTokenLifetime = 1296000,
+            AccessTokenLifetime = 3600,
         },
         new Client
         {
@@ -81,11 +89,24 @@ public static class Config
                 "http://localhost:8080/callback",
                 "capacitor://localhost/callback"
             },
+            AllowedScopes = 
+            {
+                "openid",
+                "profile",
+                "email",
+                "roles",
+                "api1",
+                "web",
+                "offline_access"   
+            },
+
 
 
             PostLogoutRedirectUris = { "http://localhost:3000/" },
             AllowOfflineAccess = true,
-            AllowedScopes = { "web" },
+            RefreshTokenUsage = TokenUsage.ReUse,
+            SlidingRefreshTokenLifetime = 1296000,
+            AccessTokenLifetime = 3600,
             AllowedCorsOrigins = { "http://localhost:3000", "http://localhost:8080" },
 
             RequireClientSecret = true,           // client must provide secret (or use PKCE)
@@ -180,7 +201,9 @@ public static class Config
             RedirectUris = defaultRedirectUris,
             PostLogoutRedirectUris = defaultPostLogoutUris,
             AllowOfflineAccess = true,
-            AllowedScopes = { "openid", "profile", "email", "roles", "api1", "web" },
+            RefreshTokenUsage = TokenUsage.ReUse,
+            SlidingRefreshTokenLifetime = 1296000,
+            AllowedScopes = { "openid", "profile", "email", "roles", "api1", "web", "offline_access" },
             AllowedCorsOrigins = defaultCorsOrigins,
             RequirePkce = true,                    // Enforce PKCE for security
             AllowPlainTextPkce = false,           // Require S256 code challenge
