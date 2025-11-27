@@ -21,6 +21,7 @@
       <ProjectReference Include="..\IdentityServer.Api\IdentityServer.Api.csproj" />
       <ProjectReference Include="..\KitPraid.Gateway\KitPraid.Gateway.csproj" />
       <ProjectReference Include="..\KitPraid.Components\KitPraid.Components.csproj" />
+      <ProjectReference Include="..\KitPraid.Services\CategoryService.Api\CategoryService.Api.csproj" />
       <ProjectReference Include="..\KitPraid.Services\IdentityServer\IdentityServer.UI\IdentityServer.UI.csproj" />
       <ProjectReference Include="..\ProductService.Api\ProductService.Api.csproj" />
     </ItemGroup>

@@ -27,8 +27,4 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Configuration\" />
-    </ItemGroup>
-
 </Project>
