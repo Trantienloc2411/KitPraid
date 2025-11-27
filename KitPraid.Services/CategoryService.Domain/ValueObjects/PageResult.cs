@@ -1,4 +1,4 @@
-﻿namespace CategoryService.Domain.ValueObjects;
+namespace CategoryService.Domain.ValueObjects;
 
 public class PageResult<T>
 {

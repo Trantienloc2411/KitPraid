@@ -1,4 +1,6 @@
-﻿namespace CategoryService.Domain;
+
+namespace CategoryService.Domain;
+
 
 public class OperationResult<T>
 {
