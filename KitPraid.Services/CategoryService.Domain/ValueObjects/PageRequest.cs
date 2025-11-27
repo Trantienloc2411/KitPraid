@@ -1,9 +1,9 @@
-namespace CategoryService.Domain.ValueObjects;
+﻿namespace CategoryService.Domain.ValueObjects;
 
 public class PageRequest
 {
     public int Page { get; }
-    public int Size { get; }
+    public int Size { get; } = 10;
 
     public int Skip => (Page - 1) * Size;
 

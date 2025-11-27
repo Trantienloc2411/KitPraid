@@ -14,6 +14,9 @@ var productApi = builder.AddProject<Projects
         .ProductService_Api>("product-api")
     .WithHttpsEndpoint(port: 6162, name: "product-api-https")
     .WaitFor(identityServer);
+
+var categoryApi = builder.AddProject<Projects.CategoryService_Api>("category-api")
+    .WithHttpsEndpoint(port: 8386, name: "category-api-https");
     
 builder.Services.AddLogging(logging => logging.AddConsole());
 
