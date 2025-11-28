@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 9.0.x
 
-    # Required because you have a ViteApp in AppHost which implies Node.js usage
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -26,6 +26,15 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
+
+    - name: Install Frontend Dependencies
+      working-directory: ./KitPraid.FrontEnd/kitpraid
+      run: npm ci
+
+    - name: Frontend Lint
+      working-directory: ./KitPraid.FrontEnd/kitpraid
+      run: npm run lint
+      continue-on-error: false
 
     - name: Build
       run: dotnet build --no-restore --configuration Release
