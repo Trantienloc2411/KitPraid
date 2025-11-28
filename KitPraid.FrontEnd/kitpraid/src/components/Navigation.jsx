@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import defaultCategories from "../data/categories";
+import { authService } from "../services/auth";
 const normalizeCategoryKey = (value = "") =>
   value
     .toString()
@@ -473,7 +474,10 @@ const Navigation = ({ categoriesData }) => {
               <a href="/wishlist">
                 <FaHeart />
               </a>
-              <a href="#" onClick={() => navigate("/auth")}>
+              <a href="#" onClick={(e) => {
+                e.preventDefault();
+                authService.redirectToLogin();
+              }}>
                 <FaUser />
               </a>
             </ul>

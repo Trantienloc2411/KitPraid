@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitPraid.AppHost", "KitPraid.AppHost\KitPraid.AppHost.csproj", "{4DE2FCF2-7A95-41E7-8EC0-893357403F9B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitPraid.Components", "KitPraid.Components\KitPraid.Components.csproj", "{46B92D83-E4BD-4D4F-BD1D-CF83D55B2968}"
@@ -263,5 +266,8 @@ Global
 		{206F3234-F7A9-4BE7-835B-95BEB4D43C8C} = {17DBC951-C658-48A4-93C2-C4225E7415F9}
 		{031FDDB4-C004-4637-89E1-B042E2C6551D} = {17DBC951-C658-48A4-93C2-C4225E7415F9}
 		{D8312691-95CB-4016-B970-B0A5AE1A7103} = {17DBC951-C658-48A4-93C2-C4225E7415F9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {413F1075-88A4-4479-A4AB-CB5CF245BBFD}
 	EndGlobalSection
 EndGlobal

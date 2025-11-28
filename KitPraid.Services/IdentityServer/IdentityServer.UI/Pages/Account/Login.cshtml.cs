@@ -26,6 +26,7 @@ namespace IdentityServer.UI.Pages.Account
         [BindProperty]
         public LoginInputModel Input { get; set; } = new();
 
+        [BindProperty(SupportsGet = true)]
         public string ReturnUrl { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
@@ -54,8 +55,19 @@ namespace IdentityServer.UI.Pages.Account
         {
             if (!ModelState.IsValid) return Page();
 
+            _logger.LogInformation("Login POST received. ReturnUrl: {ReturnUrl}", ReturnUrl);
+
             // Check if this is an IdentityServer authorization request
             var context = await _interaction.GetAuthorizationContextAsync(ReturnUrl);
+
+            if (context != null)
+            {
+                _logger.LogInformation("Valid IdentityServer context found. ClientId: {ClientId}", context.Client?.ClientId);
+            }
+            else
+            {
+                _logger.LogWarning("No IdentityServer context found for ReturnUrl: {ReturnUrl}", ReturnUrl);
+            }
 
             // Use AccountService to sign in the user
             var result = await _accountService.SignInAsync(
@@ -75,16 +87,24 @@ namespace IdentityServer.UI.Pages.Account
                     // If this is an IdentityServer authorization request, 
                     // redirect back to authorization endpoint
                     // IdentityServer middleware will detect authenticated user and continue flow
-                    if (context != null)
+                    if (context != null && !string.IsNullOrEmpty(ReturnUrl))
                     {
+                        _logger.LogInformation("Redirecting to authorization endpoint: {ReturnUrl}", ReturnUrl);
                         // Redirect back to /connect/authorize with the same parameters
                         // IdentityServer will detect the authenticated user cookie and issue authorization code
                         return Redirect(ReturnUrl);
                     }
+
+                    // For non-IdentityServer requests, redirect to return URL or home
+                    if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                    {
+                        _logger.LogInformation("Redirecting to local return URL: {ReturnUrl}", ReturnUrl);
+                        return LocalRedirect(ReturnUrl);
+                    }
                 }
 
-                // For non-IdentityServer requests, redirect to return URL or home
-                return LocalRedirect(ReturnUrl ?? Url.Content("~/"));
+                _logger.LogInformation("Redirecting to home page");
+                return LocalRedirect("~/");
             }
 
             ModelState.AddModelError(string.Empty, result.Error ?? "Invalid login attempt.");
