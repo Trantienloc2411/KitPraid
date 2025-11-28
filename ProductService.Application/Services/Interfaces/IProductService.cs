@@ -8,10 +8,11 @@ namespace ProductService.Application.Services;
 
 public interface IProductService
 {
-    public Task<OperationResult<PageResult<Product>>> GetAllProductsAsync(PageRequest pageRequest);
-    public Task<OperationResult<Product>> GetProductByIdAsync(string id);
+    public Task<OperationResult<PageResult<GetProductDto>>> GetAllProductsAsync(PageRequest pageRequest);
+    public Task<OperationResult<GetProductDetailDto>> GetProductByIdAsync(string id);
     public Task<OperationResult<Product>> UpdateProductAsync(string id, UpdateProductDto product);
     public Task<OperationResult<Product>> CreateProductAsync(CreateProductDto product);
     public Task<OperationResult<bool>> DeleteProductAsync(string id);
+    public Task<OperationResult<PageResult<GetProductDto>>> GetProductsByKeywordAsync(PageRequest pageRequest, string keyword);
 
 }

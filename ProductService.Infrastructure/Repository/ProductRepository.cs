@@ -14,9 +14,12 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
         var totalCount = await context.Products.CountAsync();
 
         var products = await context.Products
+            .Where(c => c.IsDeleted == false && c.IsActive == true)
             .Skip(pageRequest.Skip)
             .Take(pageRequest.Size)
             .Include(b => b.Brand)
+            .Include(i => i.Images)
+            .OrderByDescending(p => p.Created)
             .ToListAsync();
 
         var page = new PageResult<Product>(products, totalCount, pageRequest.Page, pageRequest.Size);
@@ -69,26 +72,29 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
         
     }
 
-    public async Task<OperationResult<PageResult<Product>>> GetAllProductsWithKeywordAsync(PageRequest pageRequest, string keyword)
+    public async Task<OperationResult<PageResult<Product>>> GetAllProductsWithKeywordAsync(
+        PageRequest pageRequest, string keyword)
     {
+        var productsQuery = context.Products
+            .Where(p => p.IsDeleted == false && p.IsActive == true &&
+                        (p.ProductName.Contains(keyword) ||
+                         p.ProductDescription.Contains(keyword) ||
+                         p.Sku.Contains(keyword)))
+            .Include(p => p.Brand)
+            .Include(p => p.Images);
 
-            var productsQuery = await context.Products
-                .Where(p => p.IsDeleted == false || p.IsActive == false &&
-                    (EF.Functions.Contains(p.ProductName, keyword) ||
-                     EF.Functions.Contains(p.ProductDescription, keyword)))
-                .ToListAsync();
+        var totalCount = await productsQuery.CountAsync();
 
+        var products = await productsQuery
+            .Skip(pageRequest.Skip)
+            .Take(pageRequest.Size)
+            .ToListAsync();
 
-            var totalCount = productsQuery.Count;
-            var products = productsQuery
-                .Skip(pageRequest.Skip)
-                .Take(pageRequest.Size)
-                .ToList();
+        var page = new PageResult<Product>(products, totalCount, pageRequest.Page, pageRequest.Size);
 
-            var page = new PageResult<Product>(products, totalCount, pageRequest.Page, pageRequest.Size);
-            return OperationResult<PageResult<Product>>.Ok(page);
-
+        return OperationResult<PageResult<Product>>.Ok(page);
     }
+
 
     public async Task<OperationResult<Product>> AddProductAsync(Product product)
     {
@@ -114,5 +120,11 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
         var result = context.Products.Update(product);
         var saveResult = await context.SaveChangesAsync();
         return OperationResult<Product>.Ok(product);
+    }
+
+    public async Task<OperationResult<Product>> GetProductBySkuAsync(string sku)
+    {
+        var result = await context.Products.FirstOrDefaultAsync(p => p.Sku.Trim().ToUpper() == sku.Trim().ToUpper());
+        return result is null ? OperationResult<Product>.Fail("Product not found.") : OperationResult<Product>.Ok(result);
     }
 }

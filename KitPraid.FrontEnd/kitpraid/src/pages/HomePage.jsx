@@ -20,16 +20,13 @@ const HomePage = ({ onSubscribe, className = "", style = {} }) => {
 
       console.log("📡 HomePage: Requesting user", userId);
 
-      const res = await fetch(
-        `https://localhost:5001/api/auth/user/${userId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch(`https://localhost:5001/auth/user/${userId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log(`📊 HomePage: Response status ${res.status}`);
 

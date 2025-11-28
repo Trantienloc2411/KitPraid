@@ -28,4 +28,27 @@ public static class BrandMapper
         brand.DateModified = DateTime.UtcNow;
         brand.IsActive = dto.IsActive;
     }
+
+    public static GetBrandDto ToGetBrandDto(Brand brand)
+    {
+        return new GetBrandDto
+        {
+            Id = brand.Id,
+            BrandCode = brand.BrandCode,
+            BrandName = brand.BrandName,
+            Description = brand.BrandDescription,
+            BrandImageUrl = brand.BrandImage
+        };
+    }
+
+    public static GetBrandItemsDto ToGetBrandItemDto(Brand brand)
+    {
+
+        return new GetBrandItemsDto
+        {
+            BrandId = brand.Id,
+            BrandName = brand.BrandName,
+            Products = brand.Products.Select(p => ProductMapper.ToGetProductDto(p)).ToList()
+        };
+    }
 }

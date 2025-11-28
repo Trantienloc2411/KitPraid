@@ -1,21 +1,22 @@
-﻿using ProductService.Application.Dtos;
+﻿using System.Diagnostics;
+using ProductService.Application.Dtos;
 using ProductService.Domain.Entities;
 
-namespace ProductService.Infrastructure.Mapping;
+namespace ProductService.Application.Mapping;
 
-public class ProductMapper
+public static class ProductMapper
 {
     public static Product ToCreateProduct(CreateProductDto dto)
     {
         return new Product
         {
-            Id = Guid.NewGuid(), // or let DB generate
+            Id = Guid.NewGuid(), 
             ProductName = dto.ProductName,
             ProductDescription = dto.ProductDescription,
             Price = dto.Price,
             Sku = dto.Sku,
             BrandId = dto.BrandId,
-            CategoryId = dto.CategoryId,   // IMPORTANT if category is required
+            CategoryId = dto.CategoryId,   
             Stock = dto.Stock,
             IsActive = dto.IsActive,
             IsDeleted = false,
@@ -59,4 +60,39 @@ public class ProductMapper
         product.Modified = DateTime.UtcNow;
     }
 
+    public static GetProductDto ToGetProductDto(Product product)
+    {
+        Debug.Assert(product.Images != null, "product.Images != null");
+        return new GetProductDto
+        {
+            Id = product.Id,
+            ProductName = product.ProductName,
+            Sku = product.Sku,
+            Price = product.Price,
+            Stock = product.Stock,
+            Attributes = product.Attributes,
+            BrandName = product.Brand?.BrandName,
+            CategoryId = product.CategoryId,
+            Images = product.Images?.ToList()
+        };
+    }
+    
+    public static GetProductDetailDto ToGetProductDetailDto(Product product)
+    {
+        return new GetProductDetailDto
+        {
+            ProductId = product.Id,
+            ProductName = product.ProductName,
+            ProductDescription = product.ProductDescription,
+            Sku = product.Sku,
+            Price = product.Price,
+            Stock = product.Stock,
+            Attributes = product.Attributes,
+            BrandDto = BrandMapper.ToGetBrandDto(product.Brand),
+            CategoryId = product.CategoryId,
+            Images = product.Images.ToList()
+        };
+    }
+    
+    
 }

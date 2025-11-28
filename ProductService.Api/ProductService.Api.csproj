@@ -8,11 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6"/>
+        <PackageReference Include="Scalar.AspNetCore" Version="2.10.3" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\IdentityServer.Application\IdentityServer.Application.csproj" />
+      <ProjectReference Include="..\ProductService.Application\ProductService.Application.csproj" />
       <ProjectReference Include="..\ProductService.Infrastructure\ProductService.Infrastructure.csproj" />
     </ItemGroup>
 

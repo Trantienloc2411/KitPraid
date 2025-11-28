@@ -11,16 +11,36 @@ namespace ProductService.Application.Services;
 
 public class BrandService(IBrandRepository brandRepository)  : IBrandService
 {
-    public async Task<OperationResult<PageResult<Brand>>> GetAllBrandsAsync(PageRequest pageRequest)
+    public async Task<OperationResult<PageResult<GetBrandDto>>> GetAllBrandsAsync(PageRequest pageRequest)
     {
         try
         {
             var result = await brandRepository.GetAllBrandsAsync(pageRequest);
-            return result;
+            if (!result.Success)
+            {
+                return OperationResult<PageResult<GetBrandDto>>.Fail(result.Error!);
+            }
+            
+            var mappedItems = result.Data?.Items.Select(BrandMapper.ToGetBrandDto).ToList();
+            if (mappedItems != null)
+            {
+                if (result.Data != null)
+                {
+                    var pageResult = new PageResult<GetBrandDto>(
+                        mappedItems, 
+                        result.Data.TotalCount, 
+                        result.Data.Page, 
+                        result.Data.Size
+                    );
+            
+                    return OperationResult<PageResult<GetBrandDto>>.Ok(pageResult);
+                }
+            }
+            return OperationResult<PageResult<GetBrandDto>>.Fail("No brands found");
         }
         catch (Exception e)
         {
-            return OperationResult<PageResult<Brand>>.Fail($"Some unexpected error. Details : {e.Message}");
+            return OperationResult<PageResult<GetBrandDto>>.Fail($"Some unexpected error. Details : {e.Message}");
         }
     }
 
@@ -36,41 +56,61 @@ public class BrandService(IBrandRepository brandRepository)  : IBrandService
         }
     }
 
-    public async Task<OperationResult<PageResult<Brand>>> GetAllItemBrandsAsync(PageRequest pageRequest, Guid brandId)
+    public async Task<OperationResult<PageResult<GetBrandItemsDto>>> GetAllItemBrandsAsync(PageRequest pageRequest, Guid brandId)
     {
         try
         {   
-            return await brandRepository.GetAllItemBrandsAsync(pageRequest, brandId);
+            var result =  await brandRepository.GetAllItemBrandsAsync(pageRequest, brandId);
+            if (!result.Success)
+            {
+                return OperationResult<PageResult<GetBrandItemsDto>>.Fail(result.Error!);
+            }
+            
+            var mappedItems = result.Data?.Items.Select(BrandMapper.ToGetBrandItemDto).ToList();
+            if (mappedItems != null)
+            {
+                if (result.Data != null)
+                {
+                    var pageResult = new PageResult<GetBrandItemsDto>(
+                        mappedItems, 
+                        result.Data.TotalCount, 
+                        result.Data.Page, 
+                        result.Data.Size
+                    );
+            
+                    return OperationResult<PageResult<GetBrandItemsDto>>.Ok(pageResult);
+                }
+            }
+            return OperationResult<PageResult<GetBrandItemsDto>>.Fail("No items found");
         }
         catch (Exception e)
         {
-            return OperationResult<PageResult<Brand>>.Fail($"Some unexpected error. Details : {e.Message}");
+            return OperationResult<PageResult<GetBrandItemsDto>>.Fail($"Some unexpected error. Details : {e.Message}");
         }
+
+        
     }
 
-    public async Task<OperationResult<Brand>> GetBrandAsync(Guid brandId)
+    public async Task<OperationResult<GetBrandDto>> GetBrandAsync(Guid brandId)
     {
         try
         {
-            return await brandRepository.GetBrandAsync(brandId);
+
+            var result =  await brandRepository.GetBrandAsync(brandId);
+            if (result.Data != null)
+            {
+                var mapped = BrandMapper.ToGetBrandDto(result.Data);
+                return OperationResult<GetBrandDto>.Ok(mapped);
+            }
+            return OperationResult<GetBrandDto>.Fail("Brand not found");
         }
         catch (Exception e)
         {
-            return OperationResult<Brand>.Fail($"Some unexpected error. Details : {e.Message}");    
+            return OperationResult<GetBrandDto>.Fail($"Some unexpected error. Details : {e.Message}");    
         }
     }
 
-    public async Task<OperationResult<Brand>> SaveBrandAsync(Brand brand)
-    {
-        try
-        {
-            return await brandRepository.SaveBrandAsync(brand);
-        }
-        catch (Exception e)
-        {
-            return OperationResult<Brand>.Fail($"Some unexpected error. Details : {e.Message}");
-        }
-    }
+
 
     public async Task<OperationResult<Brand>> DeleteBrandAsync(Guid brandId)
     {
@@ -88,13 +128,15 @@ public class BrandService(IBrandRepository brandRepository)  : IBrandService
     {
         try
         {
-            var brandOP = await brandRepository.GetBrandAsync(Guid.Parse(id));
-            if(!brandOP.Success) return brandOP;
+            var brandOp = await brandRepository.GetBrandAsync(Guid.Parse(id));
+            if(!brandOp.Success) return brandOp;
             else
             {
-                BrandMapper.ApplyUpdate(brandOP.Data, brand);
+                if (brandOp.Data != null) BrandMapper.ApplyUpdate(brandOp.Data, brand);
             }
-            return await brandRepository.UpdateBrandAsync(brandOP.Data);
+
+            if (brandOp.Data != null) return await brandRepository.UpdateBrandAsync(brandOp.Data);
+            return brandOp;
         }
         catch (Exception e)
         {
@@ -106,6 +148,8 @@ public class BrandService(IBrandRepository brandRepository)  : IBrandService
     {
         try
         {
+            var brandExisted = brandRepository.GetBrandByBrandCodeAsync(brand.BrandCode);
+            if (brandExisted.Result.Success) return OperationResult<Brand>.Fail("Brand code already existed");
             var brandCreate = BrandMapper.ToBrand(brand);
             brandCreate.Id = Guid.NewGuid();
             brandCreate.IsDeleted = false;

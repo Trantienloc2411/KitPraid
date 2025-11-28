@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ProductService.Domain.Entities;
 
@@ -20,7 +21,7 @@ public class Brand
     
     public bool IsActive {get; set;}
     public bool IsDeleted {get; set;}
-    
+    [JsonIgnore]
     public virtual ICollection<Product>? Products {get; set;}
     
 }

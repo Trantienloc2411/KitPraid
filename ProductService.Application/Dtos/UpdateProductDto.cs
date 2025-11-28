@@ -10,6 +10,6 @@ public class UpdateProductDto
     public double Price { get; set; }
     public string? CategoryId { get; set; }
     public bool? IsActive { get; set; }
-    public DateTime Modified { get; set; }
-    
+    public DateTime Modified { get; set; } = DateTime.UtcNow;
+
 }

@@ -1,11 +1,12 @@
 using System;
+using Meilisearch;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Application.Dtos;
+using ProductService.Application.Mapping;
 using ProductService.Domain;
 using ProductService.Domain.Entities;
 using ProductService.Domain.Repositories;
 using ProductService.Domain.ValueObjects;
-using ProductService.Infrastructure.Mapping;
 
 namespace ProductService.Application.Services;
 
@@ -15,6 +16,10 @@ public class ProductService(IProductRepository productRepository) : IProductServ
     {
         try
         {
+            var productExist = await productRepository.GetProductBySkuAsync(product.Sku);
+            if (productExist.Success) return OperationResult<Product>.Fail("Product already exist");
+            if (productExist.Error != null) return OperationResult<Product>.Fail(productExist.Error);
+            
             var mapping = ProductMapper.ToCreateProduct(product);
             var result = await productRepository.AddProductAsync(mapping);
             return result;
@@ -50,21 +55,93 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         }
     }
 
-    public async Task<OperationResult<PageResult<Product>>> GetAllProductsAsync(PageRequest pageRequest)
+    public async Task<OperationResult<PageResult<GetProductDto>>> GetProductsByKeywordAsync(PageRequest pageRequest, string keyword)
     {
         try
         {
-            return await productRepository.GetAllAsync(pageRequest);
+            var result = await productRepository.GetAllProductsWithKeywordAsync(pageRequest, keyword);
+            if (result.Success)
+            {
+                var mappedItems = result.Data.Items
+                    .Select(ProductMapper.ToGetProductDto)
+                    .ToList();
+                var pageResult = new PageResult<GetProductDto>(
+                    mappedItems,
+                    result.Data.TotalCount,
+                    pageRequest.Page,
+                    pageRequest.Size
+                );
+                return OperationResult<PageResult<GetProductDto>>.Ok(pageResult);
+            }
+            else
+            {
+                return OperationResult<PageResult<GetProductDto>>.Fail(result.Error ?? "Unknown error");
+            }
+            
+            
+            /*var client = new MeilisearchClient("http://localhost:7700", "ttloc2411");
+            
+            var index = await client.Index("products")
+                .UpdateSettingsAsync(
+                    new Settings
+                    {
+                        SearchableAttributes = new[] { "ProductName", "ProductDescription", "Sku" },
+                        FilterableAttributes = new[] { "Price" },
+                        SortableAttributes = new [] {"Price"}
+                    });*/
         }
-        catch (Exception e)
+        catch (DbUpdateException e)
         {
-            return OperationResult<PageResult<Product>>.Fail($"Some unexpected error. Details : {e.Message}");
+            return OperationResult<PageResult<GetProductDto>>.Fail(e.Message);
         }
     }
 
-    public Task<OperationResult<Product>> GetProductByIdAsync(string id)
+    public async Task<OperationResult<PageResult<GetProductDto>>> GetAllProductsAsync(PageRequest pageRequest)
     {
-        return productRepository.GetByIdAsync(id);
+        try
+        {
+           
+            var result = await productRepository.GetAllAsync(pageRequest);
+            var mappedItems = result.Data.Items
+                .Select(ProductMapper.ToGetProductDto)
+                .ToList();
+            var pageResult = new PageResult<GetProductDto>(
+                mappedItems,
+                result.Data.TotalCount,
+                pageRequest.Page,
+                pageRequest.Size
+            );
+            return OperationResult<PageResult<GetProductDto>>.Ok(pageResult);
+        }
+        catch (Exception e)
+        {
+            return OperationResult<PageResult<GetProductDto>>.Fail(
+                $"Some unexpected error. Details: {e.Message}"
+            );
+        }
+    }
+
+
+    public async Task<OperationResult<GetProductDetailDto>> GetProductByIdAsync(string id)
+    {
+        var result = await productRepository.GetByIdAsync(id);
+        if (result.Success)
+        {
+            if (result.Data != null)
+            {
+                var mapped = ProductMapper.ToGetProductDetailDto(result.Data);
+                return OperationResult<GetProductDetailDto>.Ok(mapped);
+            }
+            else
+            {
+                return OperationResult<GetProductDetailDto>.Fail("Product not found");
+            }
+        }
+        else
+        {
+            return OperationResult<GetProductDetailDto>.Fail(result.Error ?? "Unknown error");
+        }
+       
     }
 
     public async Task<OperationResult<Product>> UpdateProductAsync(string id, UpdateProductDto product)
