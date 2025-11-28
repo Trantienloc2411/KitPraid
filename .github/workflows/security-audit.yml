@@ -1,0 +1,38 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 * * 0' # Run once a week
+
+jobs:
+  nuget-audit:
+    name: NuGet Audit
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Check NuGet Vulnerabilities
+      # .NET 8+ has built-in audit during restore, but this explicitly fails on high/critical
+      run: dotnet restore --force --serverapi-method Get
+      
+  npm-audit:
+    name: NPM Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./KitPraid.FrontEnd/kitpraid
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Check NPM Vulnerabilities
+      run: npm audit --audit-level=high
