@@ -5,7 +5,7 @@ namespace ProductService.Infrastructure.Data;
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext(DbContextOptions<DbContext> optionsBuilderOptions) {}
+    // public ProductDbContext(DbContextOptions<DbContext> optionsBuilderOptions) {}
     
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) {}
     
