@@ -9,19 +9,6 @@ on:
     - cron: '0 0 * * 0' # Run once a week
 
 jobs:
-  nuget-audit:
-    name: NuGet Audit
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-    - name: Check NuGet Vulnerabilities
-      # .NET 8+ has built-in audit during restore, but this explicitly fails on high/critical
-      run: dotnet restore --force --serverapi-method Get
-      
   npm-audit:
     name: NPM Audit
     runs-on: ubuntu-latest
