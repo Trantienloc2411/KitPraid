@@ -113,6 +113,76 @@ namespace ProductService.Application.Test.Services
             result.Success.Should().BeFalse();
             result.Error.Should().Be("DB ERROR");
         }
+        
+        [Test]
+        public async Task CreateProductAsync_ShouldCatch_InvalidOperationException()
+        {
+            var dto = new CreateProductDto { Sku = "INV-ERR" };
+
+            // SKU does not exist → proceed to AddProductAsync
+            _repo.Setup(r => r.GetProductBySkuAsync(dto.Sku))
+                .ReturnsAsync(new OperationResult<Product>
+                {
+                    Success = false,
+                    Error = null,
+                    Data = null
+                });
+
+            _repo.Setup(r => r.AddProductAsync(It.IsAny<Product>()))
+                .ThrowsAsync(new InvalidOperationException("Invalid op"));
+
+            var result = await _service.CreateProductAsync(dto);
+
+            result.Success.Should().BeFalse();
+            result.Error.Should().Be("Details : Invalid op");
+        }
+        
+        [Test]
+        public async Task CreateProductAsync_ShouldCatch_ArgumentException()
+        {
+            var dto = new CreateProductDto { Sku = "ARG-ERR" };
+
+            _repo.Setup(r => r.GetProductBySkuAsync(dto.Sku))
+                .ReturnsAsync(new OperationResult<Product>
+                {
+                    Success = false,
+                    Error = null,
+                    Data = null
+                });
+
+            _repo.Setup(r => r.AddProductAsync(It.IsAny<Product>()))
+                .ThrowsAsync(new ArgumentException("Bad argument"));
+
+            var result = await _service.CreateProductAsync(dto);
+
+            result.Success.Should().BeFalse();
+            result.Error.Should().Be("Details : Bad argument");
+        }
+        
+        [Test]
+        public async Task CreateProductAsync_ShouldCatch_GenericException()
+        {
+            var dto = new CreateProductDto { Sku = "GEN-ERR" };
+
+            _repo.Setup(r => r.GetProductBySkuAsync(dto.Sku))
+                .ReturnsAsync(new OperationResult<Product>
+                {
+                    Success = false,
+                    Error = null,
+                    Data = null
+                });
+
+            _repo.Setup(r => r.AddProductAsync(It.IsAny<Product>()))
+                .ThrowsAsync(new Exception("Unknown explode"));
+
+            var result = await _service.CreateProductAsync(dto);
+
+            result.Success.Should().BeFalse();
+            result.Error.Should().Be("Some unexpected error. Details : Unknown explode");
+        }
+
+
+
 
 
         // ==========================
@@ -196,7 +266,8 @@ namespace ProductService.Application.Test.Services
                 {
                     ProductName = "Keyboard",
                     Sku = "SK99",
-                    ProductDescription = "Audlent keyboard"
+                    ProductDescription = "Audlent keyboard",
+                    Images = new List<Image> { new Image { ImageName = "IMG1", ImagePath = "PATH1.jpg" } }
                 }
             };
             var pageData = new PageResult<Product>(products, 1, 1, 10);
