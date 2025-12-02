@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const generatePKCE = async () => {
     // Generate code_verifier

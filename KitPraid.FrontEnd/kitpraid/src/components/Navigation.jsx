@@ -20,7 +20,6 @@ import Button from "./Button";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import defaultCategories from "../data/categories";
 import { authService } from "../services/auth";
 const normalizeCategoryKey = (value = "") =>
@@ -32,7 +31,7 @@ const normalizeCategoryKey = (value = "") =>
     .replace(/^-+|-+$/g, "");
 const Navigation = ({ categoriesData }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const categoriesView = useMemo(() => {
     if (Array.isArray(categoriesData) && categoriesData.length > 0) {
       return categoriesData;
@@ -85,9 +84,7 @@ const Navigation = ({ categoriesData }) => {
         (sub) => sub.Id === activeSubcategoryId
       )
     ) {
-      setActiveSubcategoryId(
-        selectedCategory?.categoriesSub1?.[0]?.Id ?? null
-      );
+      setActiveSubcategoryId(selectedCategory?.categoriesSub1?.[0]?.Id ?? null);
     }
   }, [categoriesView, activeCategoryId, activeSubcategoryId]);
   const selectedCategory =
@@ -192,9 +189,7 @@ const Navigation = ({ categoriesData }) => {
                         : undefined
                     }
                   >
-                    <span>
-                      {translateCategoryLabel(category.Name, "root")}
-                    </span>
+                    <span>{translateCategoryLabel(category.Name, "root")}</span>
                     {!isMobile && isActive && (
                       <FaChevronRight style={{ fontSize: "0.75rem" }} />
                     )}
@@ -290,7 +285,9 @@ const Navigation = ({ categoriesData }) => {
                 padding: 0,
                 listStyle: "none",
                 display: "grid",
-                gridTemplateColumns: isMobile ? "repeat(2, minmax(0, 1fr))" : "repeat(2, minmax(0, 1fr))",
+                gridTemplateColumns: isMobile
+                  ? "repeat(2, minmax(0, 1fr))"
+                  : "repeat(2, minmax(0, 1fr))",
                 gap: "0.5rem",
               }}
             >
@@ -474,10 +471,13 @@ const Navigation = ({ categoriesData }) => {
               <a href="/wishlist">
                 <FaHeart />
               </a>
-              <a href="#" onClick={(e) => {
-                e.preventDefault();
-                authService.redirectToLogin();
-              }}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  authService.redirectToLogin();
+                }}
+              >
                 <FaUser />
               </a>
             </ul>
@@ -678,4 +678,3 @@ const Navigation = ({ categoriesData }) => {
 };
 
 export default Navigation;
-

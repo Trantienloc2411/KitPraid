@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from "react";
 
 /**
  * Custom hook for localStorage with React state synchronization
@@ -18,7 +18,8 @@ export const useLocalStorage = (key, initialValue) => {
 
   const setValue = (value) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
@@ -28,4 +29,3 @@ export const useLocalStorage = (key, initialValue) => {
 
   return [storedValue, setValue];
 };
-
