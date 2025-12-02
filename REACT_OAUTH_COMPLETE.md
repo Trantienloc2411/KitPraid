@@ -79,9 +79,9 @@ React App                 Browser                    IdentityServer
    │                        │ 3. Show Login Form           │
    │                        │    (User enters credentials) │
    │                        │                              │
-   │                        │ 4. Authenticate User        │
+   │                        │ 4. Authenticate User         │
    │                        │                              │
-   │                        │ 5. Generate auth code       │
+   │                        │ 5. Generate auth code        │
    │                        ├──────────────────────────────┤
    │ 6. Receive auth code   │                              │
    │    + redirect back     │                              │
@@ -90,8 +90,8 @@ React App                 Browser                    IdentityServer
    │    token (with verifier│                              │
    │    for PKCE)           │                              │
    │                        ├──────────────────────────────┤
-   │                        │ 8. Validate PKCE            │
-   │                        │    Issue tokens             │
+   │                        │ 8. Validate PKCE             │
+   │                        │    Issue tokens              │
    │                        ├──────────────────────────────┤
    │ 9. Receive tokens      │                              │
    │    (access + refresh)  │                              │
