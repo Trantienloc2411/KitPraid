@@ -7,22 +7,21 @@ using ProductService.Domain.Entities;
 using ProductService.Domain.ValueObjects;
 
 namespace ProductService.Api.Controllers;
-[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class BrandController(IBrandService brandService, ILogger<BrandController> logger) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = "Admin, Customer, User")]
-    public async Task<ActionResult<OperationResult<Brand>>> GetAllBrandsAsync([FromBody] PageRequestDto request)
+    [Authorize(Roles = "Admin,Customer,User")]
+    public async Task<ActionResult<OperationResult<Brand>>> GetAllBrandsAsync([FromQuery]PageRequestDto request)
     {
         var pageRequest = new PageRequest(request.Page, request.Size);
         var brands = await brandService.GetAllBrandsAsync(pageRequest);
         return Ok(brands);
     }
 
-    [HttpGet("{id}")]
-    [Authorize(Roles = "Admin, Customer, User")]
+    [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin,Customer,User")]
     public async Task<ActionResult<OperationResult<Brand>>> GetBrandAsync(Guid id)
     {
         var brand = await brandService.GetBrandAsync(id);
@@ -30,7 +29,7 @@ public class BrandController(IBrandService brandService, ILogger<BrandController
     }
     
     [HttpGet("{id}/items")]
-    [Authorize(Roles = "Admin, Customer, User")]
+    [Authorize(Roles = "Admin,Customer,User")]
     public async Task<ActionResult<OperationResult<PageResult<GetBrandItemsDto>>>> GetAllItemBrandsAsync(Guid id, [FromQuery] PageRequestDto request)
     {
         var pageRequest = new PageRequest(request.Page, request.Size);
@@ -52,11 +51,24 @@ public class BrandController(IBrandService brandService, ILogger<BrandController
         [FromBody] UpdateBrandDto brand)
     {
         var result = await brandService.UpdateBrandAsync(id.ToString(), brand);
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+        var dto = new UpdateBrandDto
+        {
+            BrandName = result.Data?.BrandName,
+            Description = result.Data?.BrandDescription,
+            BrandImageUrl = result.Data?.BrandImage,
+            IsActive = result.Data?.IsActive ?? false
+        };
+
+        return Ok(OperationResult<UpdateBrandDto>.Ok(dto));
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
     [HttpDelete("{id}")]
-    [Authorize("User")]
+    [Authorize("Admin")]
     public async Task<ActionResult<OperationResult<GetBrandDto>>> DeleteBrandAsync(Guid id)
     {
         var result = await brandService.DeleteBrandAsync(id);

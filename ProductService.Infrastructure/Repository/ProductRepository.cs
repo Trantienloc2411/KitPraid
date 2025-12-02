@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ProductService.Domain;
 using ProductService.Domain.Entities;
 using ProductService.Domain.Repositories;
@@ -98,8 +99,8 @@ public class ProductRepository(ProductDbContext context) : IProductRepository
 
     public async Task<OperationResult<Product>> AddProductAsync(Product product)
     {
-        await context.Products.AddAsync(product);
-        await context.SaveChangesAsync();
+        EntityEntry<Product> resultAdd = await context.Products.AddAsync(product);
+        int resultSave = await context.SaveChangesAsync();
 
         var result = await context.Products
             .Where(c => c.Id == product.Id)

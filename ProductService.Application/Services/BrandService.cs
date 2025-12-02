@@ -22,7 +22,7 @@ public class BrandService(IBrandRepository brandRepository)  : IBrandService
             }
             
             var mappedItems = result.Data?.Items.Select(BrandMapper.ToGetBrandDto).ToList();
-            if (mappedItems != null)
+            if (mappedItems is not null and { Count: > 0 })
             {
                 if (result.Data != null)
                 {
@@ -67,7 +67,7 @@ public class BrandService(IBrandRepository brandRepository)  : IBrandService
             }
             
             var mappedItems = result.Data?.Items.Select(BrandMapper.ToGetBrandItemDto).ToList();
-            if (mappedItems != null)
+            if (mappedItems is not null and { Count: > 0 })
             {
                 if (result.Data != null)
                 {

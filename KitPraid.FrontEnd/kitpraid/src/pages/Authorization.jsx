@@ -22,17 +22,19 @@ const Authorization = () => {
   useEffect(() => {
     const viewParam = searchParams.get("view");
     const initialView = viewParam || "signin";
-    
+
     // Set initial view from URL params
     if (viewParam) {
       setCurrentView(initialView);
       setActiveTab(initialView);
     }
-    
+
     // Only redirect if on signin view and not authenticated
     if (initialView === "signin") {
       // Check if user is already authenticated (has token)
-      const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+      const token =
+        localStorage.getItem("authToken") ||
+        sessionStorage.getItem("authToken");
       if (!token) {
         // Not authenticated, redirect to IdentityServer Razor UI login page immediately
         // This ensures login form is always shown on Razor page, not React
@@ -42,7 +44,7 @@ const Authorization = () => {
         navigate("/", { replace: true });
       }
     }
-  }, []); // Only run once on mount
+  }, [navigate, searchParams]); // Only run once on mount
 
   // Form states
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });

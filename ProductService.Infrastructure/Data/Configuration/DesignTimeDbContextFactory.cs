@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 namespace ProductService.Infrastructure.Data.Configuration;
-
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ProductDbContext>
 {
     public ProductDbContext CreateDbContext(string[] args)

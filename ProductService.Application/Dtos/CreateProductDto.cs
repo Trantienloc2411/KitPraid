@@ -13,7 +13,6 @@ public class CreateProductDto
     [Required(ErrorMessage = "Description is required")]
     [MinLength(20, ErrorMessage = "At least 20 chars"), MaxLength(2000,  ErrorMessage = "At most 2000 chars")]
     public string ProductDescription { get; set; } = string.Empty;
-    [Required(ErrorMessage = "Price is required")]
     [Range(1, 99999999999)]
     [DataType(DataType.Currency, ErrorMessage = "Price must be between 1 and 99999999999")]
     public double Price { get; set; }

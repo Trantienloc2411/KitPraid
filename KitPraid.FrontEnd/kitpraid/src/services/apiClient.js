@@ -203,7 +203,7 @@ export const logout = () => {
   localStorage.removeItem("id_token");
 
   // Optional: Redirect to IdentityServer logout endpoint
-  const logoutUrl = `https://localhost:7070/connect/endsession?id_token_hint=${localStorage.getItem("id_token")}&post_logout_redirect_uri=${window.location.origin}/`;
+  // const logoutUrl = `https://localhost:7070/connect/endsession?id_token_hint=${localStorage.getItem("id_token")}&post_logout_redirect_uri=${window.location.origin}/`;
 
   console.log("✅ Tokens cleared. Redirecting to login...");
   window.location.href = "/login";
